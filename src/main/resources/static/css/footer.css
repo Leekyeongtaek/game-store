@@ -1,0 +1,29 @@
+footer {
+      background-color: #e0e1e2;
+      border-top: 1px solid #e5e5e5;
+      padding: 10px 0;
+    }
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-section {
+  flex: 1;
+  min-width: 280px;
+  text-align: center;
+}
+.footer-section p {
+  margin: 4px 0;
+}
+.footer-section span.label {
+  font-weight: bold;
+}
+.footer-text {
+  color: #black;
+  font-weight: bold;
+  text-align: center;
+}

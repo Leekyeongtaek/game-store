@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+.container {
+    width: 100%;
+    max-width: 1700px;
+    margin: 0 auto;
+    margin-top: 90px;
+    padding: 0 20px;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-btn {
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 0.9em;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-btn:hover {
+    background-color: #0056b3;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    z-index: 1000;
+    min-width: 300px;
+    width: 220px;
+    max-width: 400px;
+    padding: 10px 0;
+}
+
+.dropdown-menu.active {
+    display: block;
+}
+
+.dropdown-btn:hover {
+   background-color: #0056b3;
+}
+
+.menu-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 20px;
+    margin-bottom: 5px;
+    position: relative;
+    z-index: 2000;
+}
+
+.menu-section {
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.menu-section:last-child {
+    border-bottom: none;
+}
+
+.menu-section-title {
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.menu-item-list {
+    display: none;
+    margin-top: 10px;
+    padding-left: 15px;
+    border-left: 1px solid #ddd;
+}
+
+.menu-item label {
+    font-size: 0.9em;
+    margin-left: 10px;
+}
+
+.menu-item input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    margin: 0;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.menu-item input[type="radio"]:checked {
+    border-color: #007bff;
+    background-color: #007bff;
+}
+
+.menu-item-list {
+    display: none;
+    margin-top: 10px;
+    padding-left: 15px;
+    border-left: 1px solid #ddd;
+}
+
+.menu-section-title {
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1em;
+}
+
+.game-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.game-item {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    width: calc(16.66% - 20px);
+    flex-basis: calc(16.66% - 20px);
+    max-width: calc(16.66% - 20px);
+    justify-content: space-between;
+}
+
+.game-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: border 0.3s ease;
+    border: 4px solid transparent;
+    border-radius: 10px;
+}
+
+.game-item:hover img {
+    border-color: #007bff;
+}
+
+.game-info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.game-card {
+    flex: 0 0 auto; /* 이미지 영역 고정 */
+}
+
+.game-title {
+    font-size: 1em;
+    text-align: left;
+    word-break: break-word;
+    white-space: normal;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+}
+
+.game-platform-type {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8em;
+    color: gray;
+    margin-bottom: 5px;
+}
+
+.game-type {
+    color: black;
+}
+
+.game-platform {
+    font-weight: normal;
+}
+
+.game-price {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1em;
+}
+
+.game-price span {
+    display: block;
+}
+
+.discount-price {
+    color: #333;
+}
+
+.original-price {
+    color: #aaa;
+    text-decoration: line-through;
+    font-size: 0.9em;
+}
+
+.game-discount-rate-box {
+    display: inline-block;
+    background-color: #000;
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
+    max-width: 50px;
+}
+
+.game-discount-rate {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: white;
+    text-align: left;
+    min-height: 20px;
+}
+
+.filter-summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-tag:hover {
+    background-color: #d6d6d6;
+}
+
+.filter-tag span {
+    font-size: 1em;
+}
+
+.filter-tag button {
+    background: none;
+    border: none;
+    font-size: 1em;
+    color: #333;
+    cursor: pointer;
+}
+
+.filter-clear {
+    color: #007bff;
+    font-size: 1em;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.filter-clear:hover {
+    text-decoration: none;
+    color: #0056b3;
+}
+
+#showMoreGenresButton {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+    margin: 10px auto;
+    display: block;
+}
+
+#showMoreGenresButton:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.arrow-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-left: 2px solid #007bff;
+    border-bottom: 2px solid #007bff;
+    transform: rotate(-45deg);
+    margin-left: 5px;
+}
+
+.arrow-icon.open {
+    transform: rotate(135deg);
+}
+
+@media (max-width: 768px) {
+    .game-item {
+        flex-basis: calc(25% - 20px) !important;
+        max-width: calc(25% - 20px) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-item {
+        flex-basis: calc(50% - 20px) !important;
+        max-width: calc(50% - 20px) !important;
+    }
+}
+    </style>
+    <th:block th:replace="~{layout :: head}"></th:block>
+</head>
+<body>
+
+    <th:block th:replace="~{layout :: header}"></th:block>
+
+    <div class="content" th:fragment="content">
+        <div class="container">
+            <h2>할인 프로모션</h2>
+
+            <div class="filter-summary" id="filterSummary">
+                <span class="filter-clear" onclick="clearFilters()">필터 지우기</span>
+            </div>
+
+            <div class="menu-bar">
+                <div class="dropdown">
+                    <button class="dropdown-btn">정렬 및 필터</button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <!-- 정렬 섹션 -->
+                        <div class="menu-section" data-section-id="gameSort">
+                            <div class="menu-section-title">
+                                <span>정렬</span>
+                                <span class="arrow-icon" id="gameSort-arrow"></span>
+                            </div>
+                            <div class="menu-item-list" id="gameSort-section" style="display: none;">
+                                <div class="menu-item">
+                                    <input type="radio" id="sort1" name="gameSort" value="" checked>
+                                    <label for="sort1">기본</label>
+                                </div>
+                                <div class="menu-item">
+                                    <input type="radio" id="sort2" name="gameSort" value="name,desc">
+                                    <label for="sort2">이름(내림차순)</label>
+                                </div>
+                                <div class="menu-item">
+                                    <input type="radio" id="sort3" name="gameSort" value="name,asc">
+                                    <label for="sort3">이름(오름차순)</label>
+                                </div>
+                                <div class="menu-item">
+                                    <input type="radio" id="sort4" name="gameSort" value="releaseDate,asc">
+                                    <label for="sort4">출시일(오래된 순)</label>
+                                </div>
+                                <div class="menu-item">
+                                    <input type="radio" id="sort5" name="gameSort" value="releaseDate,desc">
+                                    <label for="sort5">출시일(새로운 순)</label>
+                                </div>
+                                <div class="menu-item">
+                                    <input type="radio" id="sort6" name="gameSort" value="discountPrice,asc">
+                                    <label for="sort6">가격(낮은 순)</label>
+                                </div>
+                                <div class="menu-item">
+                                    <input type="radio" id="sort7" name="gameSort" value="discountPrice,desc">
+                                    <label for="sort7">가격(높은 순)</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 유형 섹션 -->
+                        <div class="menu-section" data-section-id="gameType">
+                            <div class="menu-section-title">
+                                <span>유형</span>
+                                <span class="arrow-icon" id="gameType-arrow"></span>
+                            </div>
+                            <div class="menu-item-list" id="gameType-section" style="display: none;">
+                                <div th:each="gameType : ${gameTypes}" class="menu-item">
+                                    <input type="checkbox" th:field="${gameDiscountSearchCondition.types}"
+                                           th:value="${gameType.key}"
+                                           th:attr="data-tag=${gameType.value}">
+                                    <label th:for="${#ids.prev('types')}"
+                                           th:text="${gameType.value}">제품판</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 가격 섹션 -->
+                        <div class="menu-section" data-section-id="webBasePrice">
+                            <div class="menu-section-title">
+                                <span>가격</span>
+                                <span class="arrow-icon" id="webBasePrice-arrow"></span>
+                            </div>
+                            <div class="menu-item-list" id="webBasePrice-section" style="display: none;">
+                                <div th:each="webBasePrice : ${webBasePrices}" class="menu-item">
+                                    <input type="checkbox" th:field="${gameDiscountSearchCondition.webBasePrices}"
+                                           th:value="${webBasePrice.key}" th:attr="data-tag=${webBasePrice.value}">
+                                    <label th:for="${#ids.prev('webBasePrices')}"
+                                           th:text="${webBasePrice.value}">4,999원 이하</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 장르 섹션 -->
+                        <div class="menu-section" data-section-id="genre">
+                            <div class="menu-section-title">
+                                <span>장르</span>
+                                <span class="arrow-icon" id="genre-arrow"></span>
+                            </div>
+                            <div class="menu-item-list" id="genre-section" style="display: none;">
+                                <div id="genreList">
+                                    <div th:each="genre, iterStat : ${genres}" class="menu-item" th:if="${iterStat.index < 8}">
+                                        <input type="checkbox" th:field="${gameDiscountSearchCondition.genreIds}"
+                                               th:value="${genre.id}" th:attr="data-tag=${genre.name}">
+                                        <label th:for="${#ids.prev('genreIds')}" th:text="${genre.name}"
+                                               class="form-check-label">액션</label>
+                                    </div>
+                                </div>
+                                <button id="showMoreGenresButton" th:if="${genres.size() > 8}" onclick="showMoreGenres()">더 보기
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 플랫폼 섹션 -->
+                        <div class="menu-section" data-section-id="platform">
+                            <div class="menu-section-title">
+                                <span>플랫폼</span>
+                                <span class="arrow-icon" id="platform-arrow"></span>
+                            </div>
+                            <div class="menu-item-list" id="platform-section" style="display: none;">
+                                <div th:each="platform : ${platforms}" class="menu-item">
+                                    <input type="checkbox" th:field="${gameDiscountSearchCondition.platformIds}"
+                                           th:value="${platform.id}" th:attr="data-tag=${platform.name}">
+                                    <label th:for="${#ids.prev('platformIds')}" th:text="${platform.name}"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-list">
+                <div class="game-item" th:each="game : ${games.content}">
+                    <div class="game-card">
+                        <a href="game-details2.html" th:href="@{/games/{gameId}/details(gameId=${game.id})}"><img
+                                th:src="${game.coverImage}" th:alt="${game.name}"></a>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-platform-type">
+                            <span class="game-platform" th:if="${game.gamePlatforms != '[]'}"
+                                  th:text="${game.gamePlatforms}">[PS4, PS5]</span>
+                            <span class="game-type" th:text="${game.type}">제품판</span>
+                        </div>
+                        <div class="game-title" th:text="${game.name}">Game Title</div>
+                        <div class="game-discount-rate-box">
+                            <span class="game-discount-rate" th:text="${'-' + game.discountRate + '%'}">-25%</span>
+                        </div>
+                        <div class="game-price">
+                            <span class="discount-price" th:text="${game.discountPrice} + '원'">59,850원</span>
+                            <span class="original-price" th:text="${game.price + '원'}">79,800원</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-data" style="display:none;">
+                <div class="no-data-content">
+                    <img src="/images/empty-search.png" alt="검색 결과 없음">
+                    <p>결과 없음</p>
+                    <p>필터에 일치하는 결과가 없습니다.</p>
+                </div>
+            </div>
+
+            <div th:replace="~{fragments/pagination :: no-data}"></div>
+
+            <div th:replace="~{fragments/pagination :: pagination(${games})}"></div>
+        </div>
+    </div>
+
+    <th:block th:replace="~{layout :: footer}"></th:block>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+    const contentListSelector = '.game-list';
+/*]]>*/
+
+document.addEventListener('DOMContentLoaded', function () {
+    setupDropdown();
+    setupSectionToggle();
+    setupGenreFilter();
+    setupEventListeners();
+    updateFilterTags();
+    checkNoData(contentListSelector);
+});
+
+function setupEventListeners() {
+    document.addEventListener('change', function (event) {
+         if (event.target.matches('input[type="checkbox"], input[type="radio"]')) {
+            fetchDataWithFilters(0);
+         }
+    });
+}
+
+function setupDropdown() {
+    const dropdownBtn = document.querySelector('.dropdown-btn');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+
+    dropdownBtn.addEventListener('click', function () {
+        const isVisible = dropdownMenu.style.display === 'block';
+        dropdownMenu.style.display = isVisible ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!dropdownBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.style.display = 'none';
+        }
+    });
+}
+
+function setupSectionToggle() {
+    document.querySelectorAll('.menu-section-title').forEach(button => {
+        button.addEventListener('click', function () {
+            const sectionId = this.closest('.menu-section').dataset.sectionId;
+            toggleSection(sectionId);
+        });
+    });
+}
+
+function toggleSection(sectionId) {
+    const section = document.getElementById(`${sectionId}-section`);
+    const arrow = document.getElementById(`${sectionId}-arrow`);
+    const isVisible = section.style.display === 'block';
+    section.style.display = isVisible ? 'none' : 'block';
+    arrow.classList.toggle('open', !isVisible);
+}
+
+function setupGenreFilter() {
+    let currentVisibleGenres = 8;
+    const genres = /*[[${genres}]]*/ [];
+
+    function renderGenres() {
+        const genreList = document.getElementById('genreList');
+        const selectedGenres = getSelectedGenres();
+
+        genreList.innerHTML = '';
+
+        genres.slice(0, currentVisibleGenres).forEach(genre => {
+            const genreItem = createGenreItem(genre, selectedGenres);
+            genreList.appendChild(genreItem);
+        });
+
+        const showMoreButton = document.getElementById('showMoreGenresButton');
+        showMoreButton.style.display = currentVisibleGenres >= genres.length ? 'none' : 'block';
+    }
+
+    function getSelectedGenres() {
+        return Array.from(document.querySelectorAll('input[name="genreIds"]:checked'))
+            .map(input => input.value);
+    }
+
+    function createGenreItem(genre, selectedGenres) {
+        const genreItem = document.createElement('div');
+        genreItem.classList.add('menu-item');
+
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = genre.id;
+        input.id = `genre-${genre.id}`;
+        input.name = 'genreIds';
+        input.setAttribute('data-tag', genre.name);
+        input.checked = selectedGenres.includes(String(genre.id));
+
+        const label = document.createElement('label');
+        label.setAttribute('for', `genre-${genre.id}`);
+        label.textContent = genre.name;
+        label.classList.add('form.check-label');
+
+        genreItem.appendChild(input);
+        genreItem.appendChild(label);
+
+        return genreItem;
+    }
+
+    window.showMoreGenres = function () {
+        currentVisibleGenres = genres.length;
+        renderGenres();
+    };
+
+    renderGenres();
+}
+
+function fetchDataWithFilters(page) {
+    console.log('fetchDataWithFilters 실행...');
+    const gameDiscountSearchCondition = {
+        types: getSelectedFilterValues('input[name="types"]:checked'),
+        genreIds: getSelectedFilterValues('input[name="genreIds"]:checked'),
+        platformIds: getSelectedFilterValues('input[name="platformIds"]:checked'),
+        webBasePrices: getSelectedFilterValues('input[name="webBasePrices"]:checked'),
+        page: page || 0,
+        sort: $('input[name="gameSort"]:checked').val() || ''
+    };
+
+    updateQueryString(gameDiscountSearchCondition);
+    updateFilterTags();
+
+    const params = new URLSearchParams(gameDiscountSearchCondition).toString();
+
+    fetch(`/games/search-promotion?${new URLSearchParams(params).toString()}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(responseText => handleResponse(responseText, contentListSelector))
+    .catch(error => {
+        alert('데이터를 가져오는 중 오류가 발생했습니다.');
+        console.error('Fetch error:', error);
+    });
+}
+
+// querySelectorAll은 NodeList라는 유사 배열 객체를 반환
+function getSelectedFilterValues(selector) {
+    const selectedFilters = document.querySelectorAll(selector);
+    return Array.from(selectedFilters).map(filter => filter.value);
+}
+
+function getSelectedFilters(selector) {
+    const selectedFilters = document.querySelectorAll(selector);
+    return Array.from(selectedFilters).map(filter => ({
+        value: filter.value,
+        dataTag: filter.getAttribute('data-tag')
+    }));
+}
+
+function clearFilters() {
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    document.querySelectorAll('.filter-summary .filter-tag').forEach(function (filterTag) {
+        filterTag.remove();
+    });
+    fetchDataWithFilters();
+}
+
+// 체크박스 선택 해제시 아래 삭제 부분이 있기 때문에, 태그도 함께 삭제됨
+function updateFilterTags() {
+
+    const selectedFilters = {
+        typesFilter: getSelectedFilters('input[name="types"]:checked'),
+        genreFilter: getSelectedFilters('input[name="genreIds"]:checked'),
+        platformFilter: getSelectedFilters('input[name="platformIds"]:checked'),
+        webBasePriceFilter: getSelectedFilters('input[name="webBasePrices"]:checked'),
+    };
+
+    const filterSummary = document.getElementById('filterSummary');
+
+    const filterTags = filterSummary.querySelectorAll('.filter-tag');
+    filterTags.forEach(tag => tag.remove()); // 이 부분 없이 제품판 선택 후 추가 콘텐츠 선택하면 제품판, 제품판, 추가 콘텐츠가 표기됨
+
+    Object.values(selectedFilters).forEach(filters => {
+        filters.forEach(filter => {
+            const tagDiv = document.createElement('div');
+            tagDiv.classList.add('filter-tag');
+            tagDiv.setAttribute('data-tag', filter.dataTag);
+
+            const span = document.createElement('span');
+            span.textContent = filter.dataTag;
+
+            const button = document.createElement('button');
+            button.textContent = '✕';
+            button.addEventListener('click', function () {
+                removeFilterTag(this);
+            });
+
+            tagDiv.appendChild(span);
+            tagDiv.appendChild(button);
+
+            filterSummary.append(tagDiv);
+        });
+    });
+}
+
+function removeFilterTag(button) {
+    const tagDiv = button.parentElement;
+    const tag = tagDiv.getAttribute('data-tag');
+    const tagCheckBox = document.querySelector(`input[data-tag="${tag}"]`);
+
+    if (tagCheckBox) {
+        tagCheckBox.checked = false;
+        fetchDataWithFilters();
+    }
+
+    tagDiv.remove();
+}
+
+// History API: history.pushState, history.replaceState
+// 현재 페이지 상태를 유지하며 URL을 업데이트할 수 있도록 지원
+// 페이지가 새로고침 되지 않으므로, 사용자는 현재 보고 있는 상태를 유지한 채 URL만 변경.
+// 필터를 선택해도 화면이 초기화되지 않고, 선택된 상태가 유지.
+function updateQueryString(gameDiscountSearchCondition) {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(gameDiscountSearchCondition).forEach(([key, value]) => {
+        if (key === 'page') {
+            queryParams.append(key, value);
+        } else if (Array.isArray(value) && value.length > 0) {
+            queryParams.append(key, value.join(','));
+        }
+    });
+
+    const newUrl = `${window.location.pathname}?${queryParams.toString()}`;
+    history.pushState(null, '', newUrl);
+}
+</script>
+
+<script src="/js/pagination.js"></script>
+</body>
+</html>

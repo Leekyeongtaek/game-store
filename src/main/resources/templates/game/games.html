@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .games-container {
+            width: 100%;
+            max-width: 1000px;
+            padding-top: 55px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+    </style>
+    <th:block th:replace="~{layout :: head}"></th:block>
+</head>
+<body>
+
+    <th:block th:replace="~{layout :: header}"></th:block>
+
+    <div class="content" th:fragment="content">
+        <div class="games-container">
+            <div class="py-5 text-center">
+                <h2>게임 목록</h2>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary float-end"
+                            onclick="location.href='gameAdd.html'"
+                            th:onclick="|location.href='@{/games/add}'|"
+                            type="button">게임 등록
+                    </button>
+                </div>
+            </div>
+
+            <hr class="my-4">
+            <div class="content-list">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>게임 ID</th>
+                        <th>이름</th>
+                        <th>가격</th>
+                        <th>타입</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="game : ${games}">
+                        <td><a href="game.html" th:href="@{/games/{gameId}(gameId=${game.id})}" th:text="${game.id}">1</a></td>
+                        <td th:text="${game.name}">엘든링 일반판</td>
+                        <td th:text="${game.price}">50000</td>
+                        <td th:text="${game.typeName}">PRODUCT</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:replace="~{fragments/pagination :: no-data}"></div>
+
+            <div th:replace="~{fragments/pagination :: pagination(${games})}"></div>
+        </div>
+    </div>
+
+    <th:block th:replace="~{layout :: footer}"></th:block>
+</body>
+    <script>
+    function fetchDataWithFilters(page) {
+
+        const searchCondition = {
+            page: page || 0
+        };
+
+        const params = new URLSearchParams(searchCondition).toString();
+
+        fetch(`/games/?${new URLSearchParams(params).toString()}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(responseText => handleResponse(responseText, '.content-list'))
+        .catch(error => {
+            alert('데이터를 가져오는 중 오류가 발생했습니다.');
+            console.error('Fetch error:', error);
+        });
+    }
+    </script>
+    <script src="/js/pagination.js"></script>
+</html>

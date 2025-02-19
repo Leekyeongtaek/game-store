@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/pagination.css}" href="/static/css/pagination.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container" style="max-width: 600px">
+    <div class="py-5 text-center">
+        <h2>게임 그룹 목록</h2>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-primary float-end"
+                    onclick="location.href='gameGroupAdd.html'"
+                    th:onclick="|location.href='@{/game-groups/add}'|"
+                    type="button">게임 그룹 등록
+            </button>
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div class="content-list">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>게임 그룹 ID</th>
+                <th>게임 그룹명</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="gameGroup : ${gameGroups}">
+                <td>
+                    <a href="game-group.html"
+                       th:href="@{/game-groups/{gameGroupId}(gameGroupId=${gameGroup.id})}"
+                       th:text="${gameGroup.id}">게임그룹 id</a>
+                </td>
+                <td th:text="${gameGroup.name}">파이널 판타지</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/pagination :: no-data}"></div>
+
+    <div th:replace="~{fragments/pagination :: pagination(${gameGroups})}"></div>
+
+</div>
+</body>
+<script src="/js/pagination.js"></script>
+<script>
+function fetchDataWithFilters(page) {
+
+    const searchCondition = {
+        page: page || 0
+    };
+
+    const params = new URLSearchParams(searchCondition).toString();
+
+    fetch(`/game-groups/?${new URLSearchParams(params).toString()}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(responseText => handleResponse(responseText, '.content-list'))
+    .catch(error => {
+        alert('데이터를 가져오는 중 오류가 발생했습니다.');
+        console.error('Fetch error:', error);
+    });
+}
+</script>
+</html>

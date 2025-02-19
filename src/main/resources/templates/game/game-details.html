@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+.container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    padding-top: 55px;
+    color: #fff;
+    gap: 10px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.game-detail-container {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: rgba(31, 32, 36, 0.97);
+    margin-top: 15px;
+}
+
+.section-title {
+    font-size: 45px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.text-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: rgb(52 52 52 / 97%);
+    flex: 0.8;
+    margin: 10px 10px;
+    padding: 25px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    height: 87%; /* 부모 높이의 약 87% */
+}
+
+.image-section {
+    flex: 0.8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.image-section img {
+    width: 100%;
+    min-width: 450px;
+    border-radius: 10px;
+}
+
+.top-text-section {
+  position: relative;
+  width: 45%;
+  padding-top: calc(60% * 0.6333); /* width의 63.33%를 padding-top으로 설정 */
+  padding: 10px; /* 필요에 따라 내부 여백 조정 */
+}
+
+<!--.top-text-section > * {-->
+<!--  position: absolute;-->
+<!--  top: 10px;-->
+<!--  left: 10px;-->
+<!--  right: 10px;-->
+<!--  bottom: 10px;-->
+<!--}-->
+
+.title {
+    font-size: 26px;
+    font-weight: bold;
+    word-break: break-word;
+    white-space: normal;
+    min-height: 35px;
+    max-height: 130px;
+}
+
+.publisher {
+    font-size: 16px;
+    margin-bottom: 5px;
+    min-height: 20px;
+}
+
+.platforms {
+    display: flex;
+    gap: 5px;
+    min-height: 20px;
+    margin-top: 3px;
+    margin-bottom: 30px;
+}
+
+.content-platforms {
+    display: flex;
+    gap: 5px;
+    min-height: 20px;
+    margin-top: 3px;
+    margin-bottom: 10px;
+}
+
+.platform {
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #444;
+}
+
+.rating-and-price {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.stars {
+    color: #ffcc00;
+}
+
+.price-container {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.discounted-price {
+    font-weight: bold;
+    color: #fff;
+    font-size: 22px;
+}
+
+.no-discounted-price {
+    font-weight: bold;
+    color: #fff;
+    font-size: 26px;
+    margin-top: 10px;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 20px;
+}
+
+.no-discount-price {
+    font-weight: bold;
+    color: #fff;
+    font-size: 22px;
+}
+
+.discount {
+    color: #ff4500;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.discount-with-end {
+    color: #4caf50;
+    font-size: 18px;
+    margin-top: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.discount-rate {
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.discount-end-date {
+    color: #888;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+.promotion-end {
+    font-size: 14px;
+    color: #a2a2a2;
+    margin-top: 10px;
+}
+
+.button-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.cart-button {
+    background-color: #ff4500;
+    color: #fff;
+    border: none;
+    padding: 1.5% 4%;
+    font-size: 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+}
+
+.cart-button:hover {
+    background-color: #e03e00;
+}
+
+.wishlist-button {
+    background-color: #2c2c2c;
+    color: #ff4500;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.wishlist-button:hover {
+    background-color: #444;
+}
+
+.purchase-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #ff4500;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.purchase-btn:hover {
+    background-color: #e63e00;
+}
+
+.game-info-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+    padding-top: 75px;
+    color: #fff;
+}
+
+.game-info {
+    display: grid;
+    grid-template-columns: 120px auto;
+    gap: 10px 20px;
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+    color: #fff;
+    line-height: 1.6;
+    font-family: Arial, sans-serif;
+    max-width: 440px;
+    word-break: break-word;
+    white-space: normal;
+    text-overflow: ellipsis;
+}
+
+.game-info strong {
+    text-align: left;
+    font-weight: bold;
+}
+
+.game-info span {
+    text-align: left;
+}
+
+.right-column.disclaimer {
+    flex: 1;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 0px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #white;
+    text-align: left;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.right-column.disclaimer a {
+  color: #0070d2; /* 링크 색상 (원하는 색상으로 조정 가능) */
+  text-decoration: underline;
+}
+
+.info-content {
+    box-sizing: border-box;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: left;
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.6;
+    background-color: rgb(52 52 52 / 97%);
+}
+
+.info-content p {
+    margin-bottom: 15px;
+}
+
+.info-content p:last-child {
+    margin-bottom: 0;
+}
+
+.platform-info-container {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 25px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+    align-items: flex-start;
+}
+
+.platform-info-section {
+    width: 100%;
+    margin-top: 35px;
+}
+
+.additional-content-section {
+    padding: 40px;
+    padding-top: 75px;
+    color: #fff;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.content-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.modal-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.content-card {
+    background-color: rgba(31, 32, 36, 0.97);
+    border-radius: 10px;
+    padding: 5px;
+    text-align: center;
+    width: calc(16.66% - 20px);
+    color: #fff;
+    box-sizing: border-box;
+    flex: 0 1 calc(16.66% - 20px);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.content-card:hover img {
+    transform: scale(1.05);
+    border-color: #007bff;
+}
+
+.content-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: border 0.3s ease;
+    border: 4px solid transparent;
+    border-radius: 10px;
+}
+
+.tags {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    flex-wrap: nowrap;
+}
+
+.tag {
+    display: inline-block;
+    background-color: #d1d1d1;
+    color: #000;
+    font-size: 12px;
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+.content-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 5px 0;
+    word-break: break-word;
+    white-space: normal;
+    text-overflow: ellipsis;
+    min-height: 40px;
+    text-align: left;
+}
+
+.content-price {
+    display: flex;
+    justify-content: left;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 18px;
+    min-height: 40px;
+    margin-top: auto;
+}
+
+.content-type {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.content-discounted-price {
+    font-weight: bold;
+    color: #fff;
+    font-size: 18px;
+}
+
+.content-no-discounted-price {
+    font-weight: bold;
+    color: #fff;
+    font-size: 26px;
+    margin-top: 10px;
+}
+
+.content-original-price {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 18px;
+}
+
+.view-more-container {
+    margin-top: 20px;
+}
+
+.view-more-btn {
+    background-color: #000;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 7px 15px;
+    cursor: pointer;
+}
+
+.view-more-btn:hover {
+    background-color: #565555;
+}
+
+.edition-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+    width: 1300px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.edition-section {
+    padding: 20px;
+    padding-top: 75px;
+    color: #fff;
+    text-align: center;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.edition-card {
+    background-color: rgba(31, 32, 36, 0.97);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.edition-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.edition-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.edition-tags {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.edition-tag {
+    background-color: #444;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.edition-features {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.edition-price-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    flex-grow: 1;
+}
+
+.edition-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: auto;
+    width: 100%;
+}
+
+.discount-info {
+    font-size: 14px;
+    color: #4caf50;
+    margin-top: 5px;
+}
+
+.price-info {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ff4500;
+}
+
+.edition-original-price {
+    font-size: 16px;
+    text-decoration: line-through;
+    color: #888;
+}
+
+.edition-discount-info {
+    font-size: 14px;
+    color: #4caf50;
+    margin-bottom: 20px;
+}
+
+.edition-cart-button {
+    background-color: #ff4500;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    text-align: center;
+    padding: 10px 20px;
+    width: 250px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.edition-cart-button:hover {
+    background-color: #e03e00;
+}
+
+.edition-wishlist-button {
+    background-color: #444;
+    color: #ff4500;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.edition-wishlist-button:hover {
+    background-color: #555;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 35px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.modal-content {
+    background-color: rgba(41, 40, 45, 0.97) !important;
+    width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 10px !important;
+    padding: 20px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.modal-content-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.modal-content-price {
+    font-size: 16px;
+}
+
+.modal-original-price {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.modal-content-scroll-container {
+    overflow-y: auto;
+    max-height: calc(100% - 60px);
+    padding-right: 10px;
+}
+
+.modal-content-card {
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content-card img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.modal-tags {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.modal-tag {
+    background-color: #444;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.modal-discount {
+    font-size: 14px;
+    color: #ff4500;
+    margin-bottom: 10px;
+}
+
+.game-discount-rate-box {
+    display: flex;
+    justify-content: flex-start;
+    background-color: #fff;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 1em;
+    font-weight: bold;
+    max-width: 55px;
+    min-height: 20px;
+    margin-top: auto;
+    margin-bottom: 3px;
+}
+
+.game-discount-rate {
+    font-weight: bold;
+    color: #000;
+    text-align: left;
+    min-height: 20px;
+}
+    </style>
+    <style>
+@media (max-width: 1000px) {
+  .tags {
+    flex-wrap: wrap;
+    justify-content: flex-start; /* 또는 center */
+    gap: 5px; /* 아이템 간 간격을 줄임 */
+  }
+}
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-top: 75px;
+  }
+  .top-text-section,
+  .image-section {
+    width: 90%;
+    margin: 0 auto;
+  }
+  .text-section {
+    height: auto;
+    padding: 20px;
+  }
+  .edition-container {
+    grid-template-columns: repeat(2, 1fr);
+    width: 90%;
+    gap: 30px;
+    padding: 20px;
+  }
+  .additional-content-section {
+    padding: 30px 20px;
+  }
+  .content-card {
+    width: calc(33.33% - 20px) !important;
+    flex: 0 1 calc(33.33% - 20px) !important;
+  }
+  .game-info {
+    grid-template-columns: 100px auto;
+    max-width: 90%;
+  }
+  .section-title {
+    font-size: 35px;
+  }
+  .title {
+    font-size: 22px;
+  }
+  .platform-info-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .game-info {
+    width: 100%;
+    max-width: 90%;
+    margin-bottom: 20px;
+  }
+  .right-column.disclaimer {
+    width: 100%;
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-top: 75px;
+  }
+  .top-text-section,
+  .image-section {
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+  .text-section {
+    height: auto;
+    padding: 15px;
+  }
+  .edition-container {
+    grid-template-columns: 1fr;
+    width: 100%;
+    padding: 10px;
+    gap: 20px;
+  }
+  .additional-content-section {
+    padding: 15px;
+  }
+  .content-card {
+    width: calc(50% - 20px);
+    flex: 0 1 calc(50% - 20px);
+  }
+  .game-info {
+    grid-template-columns: 80px auto;
+    max-width: 100%;
+  }
+  .info-content {
+    padding: 10px;
+  }
+  .section-title {
+    font-size: 30px;
+  }
+  .title {
+    font-size: 20px;
+  }
+  .platform-info-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  .game-info {
+    width: 100%;
+    max-width: 95%;
+    margin-bottom: 15px;
+  }
+  .right-column.disclaimer {
+    width: 100%;
+    max-width: 95%;
+  }
+}
+    </style>
+    <th:block th:replace="~{layout :: head}"></th:block>
+</head>
+<body>
+
+<th:block th:replace="~{layout :: header}"></th:block>
+
+<div class="content" th:fragment="content">
+    <div class="game-detail-container">
+        <div class="container">
+            <div class="top-text-section">
+                <div class="text-section">
+                    <h1 class="title" th:text="${game.name}">드래곤볼 Z 카카로트 추가 에피소드: 새로운 각성 (추가 콘텐츠)</h1>
+                    <p class="publisher" th:text="${game.publisher.name}">Bandai Namco Entertainment Inc.</p>
+
+                    <div class="platforms">
+                        <span class="platform" th:each="platform : ${game.platforms}"
+                              th:text="${platform.name}">PS4</span>
+                    </div>
+
+                    <div class="rating-and-price">
+                        <!--                <div class="rating">-->
+                        <!--                    <span class="stars">⭐⭐⭐⭐⭐</span>-->
+                        <!--                    <span class="rating-text" th:text="${game.rating} + ' (' + game.ratingCount + '개의 별점)'">4.33 (6개의 별점)</span>-->
+                        <!--                </div>-->
+                        <div class="price-container" th:if="${game.gameDiscount}">
+                            <span class="discounted-price"
+                                  th:text="${game.gameDiscount.discountPrice} + ' 원'">5,400원</span>
+                            <span class="original-price" th:text="${game.price} + ' 원'">10,800원</span>
+                        </div>
+                        <div class="price-container" th:unless="${game.gameDiscount}">
+                            <span class="no-discounted-price" th:text="${game.price == '0' ? '무료' : game.price + ' 원'}">5,400원</span>
+                        </div>
+                    </div>
+
+                    <p class="discount-with-end" th:if="${game.gameDiscount}">
+                        <span class="discount-rate" th:text="${game.gameDiscount.discountRate} + '% 할인 '">50% 할인</span>
+                        <span class="discount-end-date" th:text="${game.gameDiscount.endDate} + ' GMT+9에 프로모션 종료'">2025-01-31 오후 11:59 GMT+9에 프로모션 종료</span>
+                    </p>
+
+                    <div class="button-container">
+                        <button class="cart-button">장바구니에 담기</button>
+                        <button class="wishlist-button">♡</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="image-section">
+                <img th:src="${game.coverImage}" src="dragonball_image.png" alt="드래곤볼 Z 이미지">
+            </div>
+        </div>
+
+        <div class="edition-section" th:if="${game.type.name == 'PRODUCT'} and ${game.editions.size() > 1}">
+            <h2 class="section-title">에디션:</h2>
+            <div class="edition-container">
+                <div class="edition-card" th:each="edition : ${game.editions}">
+                    <div class="edition-image">
+                        <img th:src="${edition.coverImage}" src="/static/images/디아블로2 제품판.avif" alt="에디션 이미지">
+                    </div>
+
+
+                    <div class="edition-title" th:text="${edition.name}">디럭스 에디션</div>
+
+                    <div class="edition-tags">
+                            <span class="edition-tag" th:each="platform : ${edition.platforms}"
+                                  th:text="${platform.name}">PS4</span>
+                    </div>
+
+                    <!--                    <ul class="edition-features">-->
+                    <!-- <li th:each="feature : ${edition.features}" th:text="${feature}">Dragon Ball Z: Kakarot</li>-->
+                    <!--                    </ul>-->
+
+                    <div class="edition-price-container">
+                        <div class="price-info">
+                                    <span th:if="${edition.gameDiscount}">
+                                        <span class="discounted-price"
+                                              th:text="${edition.gameDiscount.discountPrice} + ' 원'">17,127원</span>
+                                        <span class="original-price" th:text="${edition.price} + ' 원'">51,900원</span>
+                                    </span>
+                            <span class="no-discount-price" th:if="${edition.gameDiscount == null}"
+                                  th:text="${edition.price == '0' ? '무료' : edition.price + ' 원'}">79,800원</span>
+                        </div>
+                        <div class="discount-info" th:if="${edition.gameDiscount}">
+                                    <span class="discount-rate"
+                                          th:text="${edition.gameDiscount.discountRate} + '% 할인'">67% 할인</span>
+                            <span class="discount-end-date"
+                                  th:text="${edition.gameDiscount.endDate} + '까지 프로모션 종료'">2025/1/17 오후 11:59 GMT+9에 프로모션 종료</span>
+                        </div>
+                    </div>
+                    <div class="edition-button-container">
+                        <button class="edition-cart-button">장바구니에 담기</button>
+                        <button class="edition-wishlist-button">♡</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="additional-content-section"
+             th:if="${game.type.name == 'PRODUCT'} and ${game.additionalContents.size() > 0}">
+            <h2 class="section-title">추가 콘텐츠</h2>
+            <div class="content-container" id="content-container">
+                <div class="content-card" th:each="content : ${game.additionalContents}">
+                    <a th:href="@{/games/{gameId}/details(gameId=${content.id})}">
+                        <img th:src="${content.coverImage}" src="/static/images/재화.avif" alt="콘텐츠 이미지"
+                             class="content-image">
+                    </a>
+                    <div class="tags">
+                        <div class="content-platforms">
+                            <span class="tag" th:each="platform : ${content.platforms}"
+                                  th:text="${platform.name}">PS4</span>
+                        </div>
+                        <div class="content-type" th:text="${content.typeName}">캐릭터</div>
+                    </div>
+                    <p class="content-title" th:text="${content.name}">드래곤볼 Z 카카로트 시즌 패스 (추가 콘텐츠)</p>
+                    <div class="game-discount-rate-box" th:if="${content.gameDiscount}">
+                            <span class="game-discount-rate"
+                                  th:text="'-' + ${content.gameDiscount.discountRate} + '%'">-25%</span>
+                    </div>
+                    <p class="content-price">
+                            <span th:if="${content.gameDiscount}" class="content-discounted-price"
+                                  th:text="${content.gameDiscount.discountPrice} + '원'">3,780원</span>
+                        <span th:if="${content.gameDiscount}" class="content-original-price"
+                              th:text="${content.price} + '원'">5,400원</span>
+                        <span th:if="${content.gameDiscount == null}" class="content-no-discount-price"
+                              th:text="${content.price == '0' ? '무료' : content.price + '원'}">5,400원</span>
+                    </p>
+                </div>
+            </div>
+            <div class="view-more-container">
+                <button class="view-more-btn" th:if="${#lists.size(game.additionalContents) > 6}" onclick="openModal()">
+                    더 보기
+                </button>
+            </div>
+        </div>
+
+        <div id="additionalContentModal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close-btn" onclick="closeModal()">&times;</span>
+                <h2 class="modal-content-title">추가 콘텐츠</h2>
+                <div class="modal-content-scroll-container">
+                    <div class="modal-content-container">
+                        <div class="content-card" th:each="content : ${game.additionalContents}">
+                            <a th:href="@{/games/{gameId}/details(gameId=${content.id})}">
+                                <img th:src="${content.coverImage}" src="/static/images/재화.avif" alt="콘텐츠 이미지"
+                                     class="content-image">
+                            </a>
+                            <div class="tags">
+                                <div class="content-platforms">
+                                    <span class="tag" th:each="platform : ${content.platforms}"
+                                          th:text="${platform.name}">PS4</span>
+                                </div>
+                                <div class="content-type" th:text="${content.typeName}">캐릭터</div>
+                            </div>
+                            <p class="content-title" th:text="${content.name}">드래곤볼 Z 카카로트 시즌 패스 (추가 콘텐츠)</p>
+                            <div class="game-discount-rate-box" th:if="${content.gameDiscount}">
+                            <span class="game-discount-rate"
+                                  th:text="'-' + ${content.gameDiscount.discountRate} + '%'">-25%</span>
+                            </div>
+                            <p class="content-price">
+                            <span th:if="${content.gameDiscount}" class="content-discounted-price"
+                                  th:text="${content.gameDiscount.discountPrice} + '원'">3,780원</span>
+                                <span th:if="${content.gameDiscount}" class="content-original-price"
+                                      th:text="${content.price} + '원'">5,400원</span>
+                                <span th:if="${content.gameDiscount == null}" class="content-no-discount-price"
+                                      th:text="${content.price == '0' ? '무료' : content.price + '원'}">5,400원</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-info-section">
+            <h2 class="section-title" th:text="'게임 및 법률 정보'">게임 및 법률 정보</h2>
+
+            <div class="info-content">
+                <p th:utext="${game.description}">
+                    디아블로® II: 레저렉션™은 액션 롤플레잉이라는 장르 자체를 정의한 블리자드 엔터테인먼트의 대표작인 디아블로® II와 파괴의 군주® 확장팩의 완벽한 리마스터 버전입니다.
+                    디아블로 시리즈 매니아는 물론, 20년 전 PC로 출시되었을 당시 게임을 플레이해보지 않은 신규 플레이어도 오늘날의 게임 하드웨어를 활용한 현대적인 비주얼과 오디오를 통해
+                    세월이 흘러도 변함없을 디아블로® II를 즐길 수 있게 되었습니다.
+                </p>
+            </div>
+
+            <div class="platform-info-section">
+                <div class="platform-info-container">
+
+                    <div class="game-info">
+                        <strong>플랫폼:</strong>
+                        <span th:text="${game.platformsStr}">PS4, PS5</span>
+
+                        <strong>출시:</strong>
+                        <span th:text="${game.releaseDate}">2023/01/12</span>
+
+                        <strong>퍼블리셔:</strong>
+                        <span th:text="${game.publisher.name}">Bandai Namco Entertainment Inc.</span>
+
+                        <strong th:if="${game.genresStr}">장르:</strong>
+                        <span th:if="${game.genresStr}" th:text="${game.genresStr}">액션, 어드벤처, 롤플레잉 게임</span>
+
+                        <strong th:if="${game.audiosLanguagesStr}">음성:</strong>
+                        <span th:if="${game.audiosLanguagesStr}" th:text="${game.audiosLanguagesStr}">일본어</span>
+
+                        <strong th:if="${game.screenLanguagesStr}">화면 언어:</strong>
+                        <span th:if="${game.screenLanguagesStr}" th:text="${game.screenLanguagesStr}">중국어(간체자), 중국어(번체자), 타이어, 한국어</span>
+                    </div>
+
+                    <div class="right-column disclaimer">
+                        <p>
+                            PS5에서 이 게임을 플레이하려면 최신 시스템 소프트웨어로 시스템을 업데이트해야 할 수도 있습니다. 이 게임은 PS5에서 플레이할 수 있으나 PS4에서 사용할 수
+                            있는 일부
+                            기능을
+                            사용할 수 없을 수도 있습니다.
+                        </p>
+                        <p>
+                            본 소프트웨어는 다운로드 후에는 재화의 가치가 현저히 감소하기 때문에 환불되지 않습니다. 관련 법률에 따라 재화의 가치가 손상되지 않은, 즉 다운로드하지 않은 경우에
+                            한하여
+                            제품
+                            수령일로부터 14일 이내 환불을 요청하실 경우에만 환불 처리가 가능합니다.
+                        </p>
+                        <p>
+                            본 제품의 구매 또는 사용을 위해서는 SEN 이용약관에 동의하셔야 합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: footer}"></th:block>
+
+<script th:inline="javascript">
+<!--    document.addEventListener('click', function (event) {-->
+<!--        const modal = document.getElementById('additionalContentModal');-->
+<!--        if (modal && modal.style.display === 'block') {-->
+<!--            if (event.target.classList.contains('modal')) {-->
+<!--                modal.style.display = 'none';-->
+<!--            }-->
+<!--        }-->
+<!--    });-->
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const contentCards = document.querySelectorAll('#content-container .content-card');
+        contentCards.forEach((card, index) => {
+            if (index >= 6) card.style.display = 'none';
+        });
+    });
+
+    function openModal() {
+        document.getElementById("additionalContentModal").style.display = "block";
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('additionalContentModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = "auto";
+        }
+    }
+</script>
+</body>
+</html>

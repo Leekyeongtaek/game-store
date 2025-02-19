@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2>게임 그룹 상세</h2>
+    </div>
+
+    <!-- 게임 저장후 진입시 -->
+    <h2 th:if="${param.status}" th:text="'등록 완료'"></h2>
+
+    <div>
+        <label for="gameGroupId">게임 그룹 ID</label>
+        <input type="text" id="gameGroupId" name="gameGroupId" class="form-control" value="1" th:value="${gameGroup.id}" readonly>
+    </div>
+    <div>
+        <label for="name">게임 그룹명</label>
+        <input type="text" id="name" name="name" class="form-control" value="상품명" th:value="${gameGroup.name}" readonly>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row">
+        <div class="col">
+            <button class="w-100 btn btn-primary btn-lg"
+                    onclick="location.href='gameGroupEdit.html'"
+                    th:onclick="|location.href='@{/game-groups/{gameGroupId}/edit(gameGroupId=${gameGroup.id})}'|"
+                    type="button">게임 그룹 수정</button>
+        </div>
+        <div class="col">
+            <button class="w-100 btn btn-secondary btn-lg"
+                    onclick="location.href='gameGroups.html'"
+                    th:onclick="|location.href='@{/game-groups/}'|"
+                    type="button">목록으로</button>
+        </div>
+    </div>
+
+</div> <!-- /container -->
+
+</body>
+</html>

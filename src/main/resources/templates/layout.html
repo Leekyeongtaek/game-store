@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.Lee's Store</title>
+
+    <!-- 공통 CSS 파일 -->
+    <link th:href="@{/css/bootstrap.min.css}" href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/header.css}" href="/static/css/header.css" rel="stylesheet">
+    <link th:href="@{/css/footer.css}" href="/static/css/footer.css" rel="stylesheet">
+    <link th:href="@{/css/pagination.css}" href="/static/css/pagination.css" rel="stylesheet">
+
+    <!-- 공통 JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 개별 페이지에서 추가할 스타일 -->
+</head>
+<body>
+
+<header class="header">
+    <div class="header-container">
+        <div class="logo">
+            <a href="/">
+                <span class="store-name">🎮 <span class="dot"></span>Lee's Store</span>
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="/games/search-promotion">프로모션</a></li>
+                <li><a href="/games/">게임 관리</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div class="content" th:fragment="content">
+    <th:block th:insert="~{::content}"></th:block>
+</div>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <p><span class="label">제작자</span>: 이경택</p>
+            <p><span class="label">이메일</span>: lkt900520@gmail.com</p>
+            <p><span class="label">연락처</span>: 010-8375-7825</p>
+        </div>
+    </div>
+    <div class="footer-text">
+        모든 이미지 및 로고 등과 관련된 저작권은 Sony Interactive Entertainment Inc.에 있습니다.
+    </div>
+</footer>
+
+<!-- 개별 페이지에서 추가할 스크립트 -->
+<!--    <th:block th:replace="~{::script}"></th:block>-->
+
+<!-- 공통으로 사용되는 JavaScript -->
+</body>
+</html>

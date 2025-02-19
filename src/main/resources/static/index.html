@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mr.Lee's Game Store</title>
+    <style>
+        .index-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .notice {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8e8e8;
+            border: 1px solid #black;
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+    <th:block th:replace="~{layout :: head}"></th:block>
+</head>
+<body>
+<th:block th:replace="~{layout :: header}"></th:block>
+
+<div class="content" th:fragment="content">
+    <div class="index-container">
+        <h1>🎮 Mr.Lee's Game Store에 방문해 주셔서 감사합니다!</h1>
+        <p>최신 할인 게임과 다양한 장르의 게임을 확인하세요.</p>
+
+        <a href="/games/search-promotion" class="btn-primary">할인 프로모션</a>
+
+        <div class="notice">
+            <h3>⚠️ 저작권 및 비상업적 사용 안내</h3>
+            <p>
+                본 프로젝트는 <strong>포트폴리오 제작을 위한 비상업적 목적으로 제작</strong>되었습니다.<br>
+                <a href="https://store.playstation.com/ko-kr/pages/latest" target="_blank">PlayStation Store</a> 페이지의
+                UI/UX 디자인을 참고하였으나, <strong>상업적으로 활용되지 않습니다</strong>.<br>
+                모든 이미지 및 로고 등의 저작권은 해당 소유권자에게 있으며, 본 프로젝트는 공식 PlayStation과 무관합니다.
+            </p>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: footer}"></th:block>
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

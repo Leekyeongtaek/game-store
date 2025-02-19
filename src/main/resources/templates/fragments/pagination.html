@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="no-data">
+    <div class="no-data">
+        <div class="no-data-content">
+            <img src="/images/empty-search.png" alt="검색 결과 없음">
+            <p>결과 없음</p>
+            <p>조건에 일치하는 결과가 없습니다.</p>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="pagination(pageContent)">
+    <div class="pagination">
+        <a th:classappend="${pageContent.hasPrevious()} ? '' : 'disabled'"
+           th:attr="data-page=${pageContent.number - 1}">&lt;</a>
+
+        <!--        <a th:attr="data-page=0"-->
+        <!--           th:classappend="${pageContent.number == 0} ? 'active'">1</a>-->
+
+        <a th:each="pageNum : ${#numbers.sequence(pageContent.number - 1, pageContent.number + 1)}"
+           th:if="${pageNum >= 0 and pageNum < pageContent.totalPages - 1}"
+           th:attr="data-page=${pageNum}"
+           th:classappend="${pageNum == pageContent.number} ? 'active'"
+           th:text="${pageNum + 1}"></a>
+
+        <!-- number: 현재 페이지, totalPages: 총 페이지 -->
+        <!-- 현재 페이지 번호가 총 페이지 수 - 3보다 작을 때만 점(…)을 표시. -->
+        <!-- number:0 < totalPages: 5-3(2)  -->
+        <!-- number:1 < totalPages: 5-3(2)  -->
+        <!-- number:2 < totalPages: 5-3(2)  -->
+        <span class="ellipsis" th:if="${pageContent.number < pageContent.totalPages - 3}">...</span>
+
+        <a th:if="${pageContent.totalPages > 1}"
+           th:attr="data-page=${pageContent.totalPages - 1}"
+           th:classappend="${pageContent.number == pageContent.totalPages - 1} ? 'active'"
+           th:text="${pageContent.totalPages}"></a>
+
+        <a th:classappend="${pageContent.hasNext()} ? '' : 'disabled'"
+           th:attr="data-page=${pageContent.number + 1}">&gt;</a>
+    </div>
+</div>
+</body>
+</html>

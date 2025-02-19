@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .image-preview-container {
+            width: 250px;
+            height: 250px;
+            border: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .image-preview-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        .image-preview-placeholder {
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2>게임 수정</h2>
+    </div>
+
+    <form th:action="@{/games/{gameId}/edit(gameId=${gameId})}" th:object="${game}" method="post"
+          enctype="multipart/form-data">
+
+        <div>
+            <div>게임 그룹</div>
+            <select th:field="*{gameGroupId}" class="form-select">
+                <option value="">==게임 그룹 선택==</option>
+                <option th:each="gameGroup : ${gameGroups}" th:value="${gameGroup.id}"
+                        th:text="${gameGroup.name}">엘든링 제품판
+                </option>
+            </select>
+            <p class="text-danger" th:if="${#fields.hasErrors('gameGroupId')}" th:errors="*{gameGroupId}"></p>
+        </div>
+
+        <div>
+            <label for="name">이름</label>
+            <input type="text" id="name" th:field="*{name}" class="form-control">
+            <p class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+        </div>
+
+        <div>
+            <label for="price">가격</label>
+            <input type="number" id="price" th:field="*{price}" class="form-control">
+            <p class="text-danger" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+        </div>
+
+        <div>
+            <label for="releaseDate">출시일</label>
+            <input type="date" id="releaseDate" name="releaseDate" th:value="${game.releaseDate}"
+                   class="form-control">
+            <p class="text-danger" th:if="${#fields.hasErrors('releaseDate')}" th:errors="*{releaseDate}"></p>
+        </div>
+
+        <div>
+            <label for="description">게임 정보</label>
+            <textarea id="description" th:field="*{description}" class="form-control"></textarea>
+            <p class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+        </div>
+
+        <div>
+            <label for="coverImage">커버 이미지</label>
+            <input type="file" id="coverImage" name="coverImage" accept="image/*"
+                   onchange="previewImage(event, 'coverImagePreview')">
+            <div id="coverImagePreview" class="image-preview-container">
+                <div class="image-preview-placeholder">
+                    <img th:if="${game.coverImageUrl != null}" th:src="@{${game.coverImageUrl}}"
+                         alt="Current Cover Image">
+                    <span th:if="${game.coverImageUrl == null}">이미지를 업로드하세요</span>
+                </div>
+            </div>
+            <p class="text-danger" th:if="${#fields.hasErrors('coverImage')}" th:errors="*{coverImage}"></p>
+        </div>
+
+        <hr class="my-4">
+
+        <div id="discountSection">
+            <div>
+                <div>할인 여부</div>
+                <label>
+                    <input type="radio" th:field="*{isDiscounted}" value="false">
+                    아니오
+                </label>
+                <label>
+                    <input type="radio" th:field="*{isDiscounted}" value="true">
+                    예
+                </label>
+            </div>
+
+            <div id="discountDetails">
+                <div>
+                    <label for="discountRate">할인율</label>
+                    <input type="number" id="discountRate" th:field="*{gameDiscount.discountRate}" class="form-control" oninput="calculateDiscountPrice()">
+                </div>
+                <div>
+                    <label>할인가</label>
+                    <input type="number" id="discountPrice" th:field="*{gameDiscount.discountPrice}"
+                           class="form-control" readonly>
+                </div>
+                <div>
+                    <label for="discountStartDate">할인 시작일</label>
+                    <input type="date" id="discountStartDate" name="gameDiscount.startDate"
+                           th:value="${game.gameDiscount.startDate}"
+                           class="form-control">
+                </div>
+
+                <div>
+                    <label for="discountEndDate">할인 종료일</label>
+                    <input type="date" id="discountEndDate" name="gameDiscount.endDate"
+                           th:value="${game.gameDiscount.endDate}"
+                           class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div>
+            <div>배급사</div>
+            <select th:field="*{publisherId}" class="form-select">
+                <option value="">==배급사 선택==</option>
+                <option th:each="publisher : ${publishers}" th:value="${publisher.id}"
+                        th:text="${publisher.name}">CAMCOM ASIA
+                </option>
+            </select>
+            <p class="text-danger" th:if="${#fields.hasErrors('publisherId')}" th:errors="*{publisherId}"></p>
+        </div>
+
+        <div>
+            <div>게임 타입</div>
+            <div th:each="gameType : ${gameTypes}" class="form-check form-check-inline">
+                <input type="radio" th:field="*{type}" th:value="${gameType.key}" class="form-check-input">
+                <label th:for="${#ids.prev('type')}" th:text="${gameType.value}" class="form-check-label">
+                    PRODUCT
+                </label>
+            </div>
+            <p class="text-danger" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
+        </div>
+
+        <div>
+            <div>게임 장르</div>
+            <div th:each="genre : ${genres}" class="form-check form-check-inline">
+                <input type="checkbox" th:field="*{gameGenreIds}" th:value="${genre.id}" class="form-check-input">
+                <label th:for="${#ids.prev('gameGenreIds')}"
+                       th:text="${genre.name}" class="form-check-label">액션</label>
+            </div>
+        </div>
+
+        <div>
+            <div>플랫폼</div>
+            <div th:each="platform : ${platforms}" class="form-check form-check-inline">
+                <input type="checkbox" th:field="*{gamePlatformIds}" th:value="${platform.id}" class="form-check-input">
+                <label th:for="${#ids.prev('gamePlatformIds')}"
+                       th:text="${platform.name}" class="form-check-label">PS4</label>
+            </div>
+        </div>
+
+        <div>
+            <div>음성</div>
+            <div th:each="language : ${languages}" class="form-check form-check-inline">
+                <input type="checkbox" th:field="*{gameAudioLanguageIds}" th:value="${language.id}"
+                       class="form-check-input">
+                <label th:for="${#ids.prev('gameAudioLanguageIds')}"
+                       th:text="${language.name}" class="form-check-label">한국어</label>
+            </div>
+        </div>
+
+        <div>
+            <div>화면 언어</div>
+            <div th:each="language : ${languages}" class="form-check form-check-inline">
+                <input type="checkbox" th:field="*{gameScreenLanguageIds}" th:value="${language.id}"
+                       class="form-check-input">
+                <label th:for="${#ids.prev('gameScreenLanguageIds')}"
+                       th:text="${language.name}" class="form-check-label">한국어</label>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row">
+            <div class="col">
+                <button class="w-100 btn btn-primary btn-lg" type="submit" disabled>게임 수정</button>
+            </div>
+            <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg"
+                        onclick="location.href='game.html'"
+                        th:onclick="|location.href='@{/games/{gameId}(gameId=${game.id})}'|"
+                        type="button">취소
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</div> <!-- /container -->
+</body>
+<script src="/js/game-form.js"></script>
+</html>
