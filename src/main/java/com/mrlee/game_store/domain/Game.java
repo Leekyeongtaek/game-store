@@ -199,7 +199,6 @@ public class Game extends AuditingDateTime {
                 gameDiscount.update(form);
             } else {
                 addGameDiscount(form.toEntity());
-                ;
             }
         } else {
             removeGameDiscount();
