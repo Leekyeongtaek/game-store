@@ -196,7 +196,19 @@ public class GameService {
     }
 
     public PageImpl<GamePromotionResponse> searchPromotionGame(Pageable pageable, GameDiscountSearchCondition dto) {
-        return gameQueryRepository.searchPromotionGame(pageable, dto);
+        PageImpl<GamePromotionResponse> result = gameQueryRepository.searchPromotionGame(pageable, dto);
+        causeThreadSleep(result.getContent().size());
+        return result;
+    }
+
+    private void causeThreadSleep(int contentSize) {
+        if (contentSize == 0) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public GameDetailsResponse getGameDetails(Long gameId) {
