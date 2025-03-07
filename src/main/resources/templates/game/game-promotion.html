@@ -483,14 +483,6 @@
                 </div>
             </div>
 
-            <div class="no-data" style="display:none;">
-                <div class="no-data-content">
-                    <img src="/images/empty-search.png" alt="검색 결과 없음">
-                    <p>결과 없음</p>
-                    <p>필터에 일치하는 결과가 없습니다.</p>
-                </div>
-            </div>
-
             <div th:replace="~{fragments/pagination :: no-data}"></div>
 
             <div th:replace="~{fragments/pagination :: pagination(${games})}"></div>
@@ -575,7 +567,7 @@ function setupGenreFilter() {
 
     function getSelectedGenres() {
         return Array.from(document.querySelectorAll('input[name="genreIds"]:checked'))
-            .map(input => input.value);
+            .map(input => input.value); // input 요소의 value 값을 추출하여 새로운 배열을 만듭니다.
     }
 
     function createGenreItem(genre, selectedGenres) {
