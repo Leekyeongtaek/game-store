@@ -42,3 +42,10 @@ src/main/resources/static/images/
 # 환경 변수 및 설정 파일 제외
 application.yml
 application-*.yml
+
+# 로그 폴더 및 파일 무시
+logs/
+*.log
+
+# 로그백 제외
+logback-spring.xml
