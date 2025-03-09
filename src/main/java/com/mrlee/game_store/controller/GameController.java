@@ -7,6 +7,7 @@ import com.mrlee.game_store.dto.response.*;
 import com.mrlee.game_store.dto.response.GamePromotionResponse;
 import com.mrlee.game_store.service.GameService;
 import com.mrlee.game_store.service.RedisCacheManager;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
@@ -86,7 +87,9 @@ public class GameController {
     }
 
     @GetMapping("/search-promotion")
-    public String searchPromotionGame(@PageableDefault(size = 18) Pageable pageable, @ModelAttribute GameDiscountSearchCondition condition, Model model) {
+    public String searchPromotionGame(@PageableDefault(size = 18) Pageable pageable, @ModelAttribute GameDiscountSearchCondition condition,
+                                      Model model, HttpServletRequest request) {
+        log.info("[RequestUserInfo] IP={}, User-Agent={}", request.getRemoteAddr(), request.getHeader("User-Agent"));
         PageImpl<GamePromotionResponse> games = gameService.searchPromotionGame(pageable, condition);
         model.addAttribute("searchCondition", condition);
         model.addAttribute("games", games);
