@@ -1,13 +1,12 @@
 package com.mrlee.game_store.controller;
 
-import com.mrlee.game_store.domain.GameType;
 import com.mrlee.game_store.dto.request.GameSaveForm;
 import com.mrlee.game_store.dto.request.GameDiscountSearchCondition;
 import com.mrlee.game_store.dto.request.GameUpdateForm;
 import com.mrlee.game_store.dto.response.*;
 import com.mrlee.game_store.dto.response.GamePromotionResponse;
-import com.mrlee.game_store.service.GameGroupService;
 import com.mrlee.game_store.service.GameService;
+import com.mrlee.game_store.service.RedisCacheManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
@@ -29,7 +28,7 @@ import java.util.*;
 public class GameController {
 
     private final GameService gameService;
-    private final GameGroupService gameGroupService;
+    private final RedisCacheManager redisCacheManager;
 
     @GetMapping("/")
     public String games(Pageable pageable, Model model) {
@@ -102,52 +101,39 @@ public class GameController {
     }
 
     //------------------------- ModelAttribute -------------------------//
-
     @ModelAttribute("gameGroups")
     public List<GameGroupResponse> gameGroups() {
-        List<GameGroupResponse> gameGroupList = gameGroupService.getGameGroupList();
-        return gameGroupList.stream()
-                .sorted(Comparator.comparing(GameGroupResponse::getName))
-                .toList();
+        return redisCacheManager.getCacheGameGroups();
     }
 
     @ModelAttribute("publishers")
     public List<PublisherResponse> publishers() {
-        return gameService.getPublishers();
+        return redisCacheManager.getCachePublishers();
     }
 
     @ModelAttribute("languages")
     public List<LanguageResponse> languages() {
-        return gameService.getLanguages();
+        return redisCacheManager.getCacheLanguages();
     }
 
     @ModelAttribute("platforms")
     public List<PlatformResponse> platforms() {
-        return gameService.getPlatforms();
+        return redisCacheManager.getCachePlatforms();
     }
 
     @ModelAttribute("genres")
     public List<GenreResponse> genres() {
-        return gameService.getGenres();
+        return redisCacheManager.getCacheGenres();
     }
 
     @ModelAttribute("gameTypes")
     public Map<String, String> gameTypes() {
-        Map<String, String> gameTypeMap = new LinkedHashMap<>();
-        for (GameType gameType : GameType.values()) {
-            gameTypeMap.put(gameType.name(), gameType.getKoreanName());
-        }
-        return gameTypeMap;
+        return redisCacheManager.getCacheGameTypes();
     }
 
     @ModelAttribute("webBasePrices")
     public Map<String, String> webBasePrices() {
-        Map<String, String> webBasePrices = new LinkedHashMap<>();
-        webBasePrices.put("0-4999", "4,999원 이하");
-        webBasePrices.put("5000-9999", "5,000원 - 9,999원");
-        webBasePrices.put("10000-19999", "10,000원 - 19,999원");
-        webBasePrices.put("20000-49999", "20,000원 - 49,999원");
-        webBasePrices.put("50000-999999", "50,000원 이상");
-        return webBasePrices;
+        return redisCacheManager.getCacheWebBasePrices();
     }
+
 }
