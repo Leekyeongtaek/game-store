@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class MyAspect {
 
-    @Around("execution(* com.mrlee.game_store.service..*.*(..))")
+    @Around("execution(* com.mrlee.game_store.service.GameService.*(..))")
     public Object monitorExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("Execution method: {}", joinPoint.getSignature().getName());
 
