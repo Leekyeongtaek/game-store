@@ -17,6 +17,7 @@
 - 뷰 템플릿 : 타임리프
 
 ### 테이블 ERD
+<img width="800" alt="game_stroe_erd" src="https://github.com/Leekyeongtaek/game-store/issues/1#issue-2906383939">
 
 ### 학습한 것 실습 목록
 - JPA만을 사용해 프로젝트~~~
