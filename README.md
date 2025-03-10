@@ -25,6 +25,8 @@
 |game_discount|idx_discount_price|discount_price|필터에서 금액 범위 선택|
 |game_genre|idx_game_id_genre_id|game_id, genre_id|필터에서 장르 선택|
 
+- 할인 게임 목록 조회 쿼리에서 사용되는 인덱스
+
 ### 학습한 것 실습 목록
 - JPA만을 사용해 프로젝트~~~
 - 스프링 AOP를 사용해 게임~~~
