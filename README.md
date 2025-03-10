@@ -21,6 +21,7 @@
 
 |테이블|인덱스명|컬럼|용도|
 |------|---|---|---|
+|game|idx_game_discount_id|game_discount_id|할인 게임 목록 조회시 game 테이블과 game_discount 테이블 조인시 사용|
 |game|idx_type|type|필터에서 게임 유형 선택|
 |game_discount|idx_discount_price|discount_price|필터에서 금액 범위 선택|
 |game_genre|idx_game_id_genre_id|game_id, genre_id|필터에서 장르 선택|
