@@ -19,9 +19,11 @@
 ### 테이블 ERD
 <img width="800" alt="game_stroe_erd" src="https://github.com/user-attachments/assets/4608589b-2476-43ea-b1bb-1b13f171c846">
 - 게임 할인 목록 조회시 사용한 인덱스표
-|제목|내용|설명|
-|------|---|---|
-|테스트1|테스트2|테스트3|
+
+|테이블|인덱스명|컬럼|용도|
+|------|---|---|---|
+|game|idx_type|type|필터 체크박스 유형 선택|
+|game_discount|idx_discount_price|discount_price|필터 체크박스 가격 범위 유형 선택|
 
 ### 학습한 것 실습 목록
 - JPA만을 사용해 프로젝트~~~
