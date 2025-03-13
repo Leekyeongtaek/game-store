@@ -1,10 +1,7 @@
 package com.mrlee.game_store.membership.domain;
 
 import com.mrlee.game_store.common.AuditingDateTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class Member extends AuditingDateTime {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
     @Column(name = "name", length = 45)

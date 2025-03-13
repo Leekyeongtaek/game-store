@@ -17,6 +17,7 @@ public class MemberMembership extends AuditingDateTime {
     public enum MembershipStatus {ACTIVE, CANCELLED, EXPIRED}
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "member_id", nullable = false)
     private Long memberId;

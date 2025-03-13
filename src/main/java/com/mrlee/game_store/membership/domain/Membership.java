@@ -15,6 +15,7 @@ public class Membership extends AuditingDateTime {
     public enum MembershipType {FREE, BRONZE, SILVER, GOLD}
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "membership_id")
     private Long id;
     @Enumerated(EnumType.STRING)
