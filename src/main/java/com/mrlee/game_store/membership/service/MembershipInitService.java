@@ -3,9 +3,7 @@ package com.mrlee.game_store.membership.service;
 import com.mrlee.game_store.membership.domain.Member;
 import com.mrlee.game_store.membership.domain.MemberMembership;
 import com.mrlee.game_store.membership.domain.Membership;
-import com.mrlee.game_store.membership.repository.MemberMembershipRepository;
-import com.mrlee.game_store.membership.repository.MemberRepository;
-import com.mrlee.game_store.membership.repository.MembershipRepository;
+import com.mrlee.game_store.membership.repository.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +21,23 @@ public class MembershipInitService {
     private final MemberRepository memberRepository;
     private final MembershipRepository membershipRepository;
     private final MemberMembershipRepository memberMembershipRepository;
+    private final PaymentRepository paymentRepository;
+    private final RefundRepository refundRepository;
 
     @PostConstruct
     public void initService() {
         deleteAllMemberMembership();
         initializeFreeMemberships();
+        deleteAllPayment();
+        deleteAllRefund();
+    }
+
+    private void deleteAllRefund() {
+        refundRepository.deleteAll();
+    }
+
+    private void deleteAllPayment() {
+        paymentRepository.deleteAll();
     }
 
     private void deleteAllMemberMembership() {

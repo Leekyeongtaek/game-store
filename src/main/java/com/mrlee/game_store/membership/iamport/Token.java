@@ -1,4 +1,4 @@
-package com.mrlee.game_store.membership.service;
+package com.mrlee.game_store.membership.iamport;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -6,7 +6,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class IamPortToken {
+public class Token {
     @JsonProperty(value = "access_token")
     private String accessToken;
     private long now;

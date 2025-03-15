@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,5 +37,9 @@ public class MemberMembership extends AuditingDateTime {
         this.startDate = LocalDate.now();
         this.endDate = LocalDate.now().plusDays(durationDays);
         this.status = MembershipStatus.ACTIVE;
+    }
+
+    public void cancel() {
+        this.status = MembershipStatus.CANCELLED;
     }
 }
