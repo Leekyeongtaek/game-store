@@ -16,9 +16,10 @@
 - ORM 기술 : JPA, SpringDataJPA, QueryDSL
 - 뷰 템플릿 : 타임리프
 
-### 테이블 ERD
+## 테이블 ERD
+
+### 게임 스토어
 <img width="800" alt="game_stroe_erd" src="https://github.com/user-attachments/assets/4608589b-2476-43ea-b1bb-1b13f171c846">
-<img width="800" alt="game_stroe_erd" src="https://github.com/user-attachments/assets/b7e6c63a-8127-42e7-b277-0d6282c9f687">
 
 |테이블|인덱스명|컬럼|용도|
 |------|---|---|---|
@@ -28,6 +29,17 @@
 |game_genre|idx_game_id_genre_id|game_id, genre_id|필터에서 장르 선택|
 
 - 할인 게임 목록 조회 쿼리에서 사용되는 인덱스
+
+### 멤버십
+<img width="800" alt="game_stroe_erd" src="https://github.com/user-attachments/assets/b7e6c63a-8127-42e7-b277-0d6282c9f687">
+
+|테이블|용도|
+|----|---|
+|member|회원 정보|
+|membership|멤버십 정보|
+|member_subscription|멤버십 구독|
+|payment|결제|
+|refund|환불|
 
 ### 학습한 것 실습 목록
 - 자바 기본기 관련 ~~~
