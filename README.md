@@ -18,6 +18,7 @@
 
 ### 테이블 ERD
 <img width="800" alt="game_stroe_erd" src="https://github.com/user-attachments/assets/4608589b-2476-43ea-b1bb-1b13f171c846">
+<img width="800" alt="game_stroe_erd" src="https://github.com/user-attachments/assets/b7e6c63a-8127-42e7-b277-0d6282c9f687">
 
 |테이블|인덱스명|컬럼|용도|
 |------|---|---|---|
