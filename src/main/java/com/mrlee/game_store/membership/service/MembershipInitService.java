@@ -1,7 +1,7 @@
 package com.mrlee.game_store.membership.service;
 
 import com.mrlee.game_store.membership.domain.Member;
-import com.mrlee.game_store.membership.domain.MemberMembership;
+import com.mrlee.game_store.membership.domain.MemberSubscription;
 import com.mrlee.game_store.membership.domain.Membership;
 import com.mrlee.game_store.membership.repository.*;
 import jakarta.annotation.PostConstruct;
@@ -20,7 +20,7 @@ public class MembershipInitService {
 
     private final MemberRepository memberRepository;
     private final MembershipRepository membershipRepository;
-    private final MemberMembershipRepository memberMembershipRepository;
+    private final MemberSubscriptionRepository memberSubscriptionRepository;
     private final PaymentRepository paymentRepository;
     private final RefundRepository refundRepository;
 
@@ -41,7 +41,7 @@ public class MembershipInitService {
     }
 
     private void deleteAllMemberMembership() {
-        memberMembershipRepository.deleteAll();
+        memberSubscriptionRepository.deleteAll();
     }
 
     private void initializeFreeMemberships() {
@@ -51,8 +51,8 @@ public class MembershipInitService {
                 .get();
 
         for (Member member : members) {
-            MemberMembership memberMembership = new MemberMembership(member.getId(), freeMembership.getId(), freeMembership.getDurationDays());
-            memberMembershipRepository.save(memberMembership);
+            MemberSubscription memberSubscription = MemberSubscription.createMemberSubscription(member.getId(), freeMembership);
+            memberSubscriptionRepository.save(memberSubscription);
         }
     }
 }

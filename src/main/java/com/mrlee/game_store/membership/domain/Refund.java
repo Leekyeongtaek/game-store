@@ -30,4 +30,14 @@ public class Refund extends AuditingDateTime {
     private LocalDateTime refundDate;
     @Enumerated(EnumType.STRING)
     private RefundStatus status;
+    @Column(name = "failure_reason")
+    private String failureReason;
+
+    public Refund(Long paymentId, int amount, String reason) {
+        this.paymentId = paymentId;
+        this.amount = amount;
+        this.reason = reason;
+        this.refundDate = LocalDateTime.now();
+        this.status = RefundStatus.COMPLETE;
+    }
 }

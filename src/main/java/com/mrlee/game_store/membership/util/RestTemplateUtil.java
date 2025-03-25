@@ -35,7 +35,7 @@ public class RestTemplateUtil {
 
     private IamPortResponse callIamPort(HttpEntity<Object> httpEntity) {
         cnt++;
-        if (cnt % 2 != 0 || cnt == 2) {
+        if (cnt % 2 != 0) {
             throw new RuntimeException("아임포트 서버 오류 발생..");
         }
         return new IamPortResponse("200", "요청 성공");

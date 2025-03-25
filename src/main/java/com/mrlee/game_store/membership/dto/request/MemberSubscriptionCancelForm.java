@@ -5,7 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class MembershipJoinForm {
+public class MemberSubscriptionCancelForm {
+
     private Long memberId;
-    private Long membershipId;
+    private String reason;
 }
