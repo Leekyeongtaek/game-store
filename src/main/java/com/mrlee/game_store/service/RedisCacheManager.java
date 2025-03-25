@@ -14,12 +14,9 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-//데이터를 변경하는 작업(INSERT, UPDATE, DELETE)이 없음.
-//JPA가 변경 감지를 비활성화하고 성능 최적화 효과가 있음.
-//결국 트랜잭션 애노테이션은 필요하지 않다.
-//@Transactional(readOnly = true)
+//데이터를 변경하는 작업(INSERT, UPDATE, DELETE)이 없음. - > 트랜잭션 애노테이션은 필요하지 않다.
+//@Transactional(readOnly = true) -> JPA가 변경 감지를 비활성화하고 성능 최적화 효과가 있음.
 @RequiredArgsConstructor
-//특정 계층에 속하지 않는(C,S,R) 경우는 컴포넌트 사용.
 @Component
 public class RedisCacheManager {
 
@@ -166,10 +163,8 @@ public class RedisCacheManager {
         return webBasePrices;
     }
 
-// 제네릭 메서드와 와일드 카드는 용도가 다르다!
-/*    private String toA(List<?> aa) {
-        return "";
-    }*/
+    // 제네릭 메서드는 타입 매개변수를 직접 정의하여 사용하고, 와일드카드는 이미 정의된 제네릭 타입의 범위를 제한하거나 확장할 때 사용
+    // private String toJson(List<?> list) {...}
 
     //직렬화(Serialization): 객체 → 바이트 스트림(파일, 네트워크 전송용 데이터)으로 변환하는 과정.
     //역직렬화(Deserialization): 바이트 스트림 → 객체로 변환하는 과정.
