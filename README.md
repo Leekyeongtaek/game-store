@@ -112,3 +112,44 @@ GameController {
 __개선 사항__
 - 레디스 캐시 적용 전에는 게임 등록 관련 화면 진입시마다 매번 5번의 쿼리가 발생.<br>
 - 캐시 적용 후에는 해당 데이터가 레디스 캐시에 키로 존재하지 않으면 최초 한번 조회 후 캐시 데이터를 반환하는 방식으로 변경해서 성능 향상.
+
+#### HTTP 통신 설정
+```java
+@Bean
+public RestTemplate restTemplate() {
+  SimpleClientHttpRequestFactory httpRequestFactory = new SimpleClientHttpRequestFactory();
+  httpRequestFactory.setConnectTimeout(3000); //(연결시) 서버와 연결(Connection) 시도 최대 대기 시간
+  httpRequestFactory.setReadTimeout(5000); //(응답시) socketTimeout, 서버 응답 대기 시간
+}
+/**
+ * RestTemplate 커넥션 타임아웃용 테스트 API
+ *
+ * @return
+ */
+@GetMapping("/connection-test")
+public ResponseEntity<Void> testConnection() {
+    try {
+        restTemplate.getForObject("http://10.255.255.1", String.class);
+    } catch (ResourceAccessException e) {
+        log.info("ConnectTimeout:: {}", e.getMessage());
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
+}
+
+/**
+ * HTTPBin HTTP 테스트용 API
+ * @return
+ */
+@GetMapping("/read-test")
+public ResponseEntity<Void> testReadTimeout() {
+    try {
+        restTemplate.getForObject("https://httpbin.org/delay/6", String.class);
+    } catch (ResourceAccessException e) {
+        log.info("ReadTimeout:: {}", e.getMessage());
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
+}
+```
+__타임아웃 옵션__
+- HTTP 통신 시 연결 시간(connect timeout)이나 응답 대기 시간(read timeout)을 설정하지 않으면, 네트워크 지연이나 서버 응답이 없는 상황에서도 요청을 기다리게 된다<br>
+- 결국 쓰레드 풀에 쓰레드가 반납되지 않게 되어 서버가 다운되는 상황이 발생하게 된다
