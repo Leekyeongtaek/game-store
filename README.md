@@ -400,7 +400,7 @@ void testProxy() {
 - 주요 학습 목표: 멤버십 등급에 따른 환불 금액 계산
 
 #### 초기 구조의 한계점
-- MemberSubscription 엔티티 내부에서 비즈니스 로직을 처리 -> 지연 로딩 문제 및 엔티티에 비즈니스 로직이 존재함
+- MemberSubscription 엔티티 내부에서 비즈니스 로직을 처리하면서 지연 로딩 문제, 엔티티의 책임이 너무 커지는 상황 발생
 
 ```java
 public class MemberSubscription {
