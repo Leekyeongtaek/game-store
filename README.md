@@ -46,7 +46,7 @@
 
 ### 1. 레디스 캐시 적용
 __개선 전__
-- 게임 등록 관련 화면 진입시마다 매번 5번의 쿼리가 발생
+- 게임 등록 관련 화면 진입시마다 변경 가능성 없는 동일한 데이터를 DB에서 반복 조회하는 문제 발생
 ```java
 @Controller
 GameController {
@@ -65,7 +65,7 @@ GameController {
 ```
 __개선 후__
 - RedisCacheManager 클래스를 생성 후 빈으로 등록
-- 해당 데이터가 레디스 캐시에 존재하지 않으면 최초 한번 조회 후 캐시 데이터를 반환하는 방식으로 변경해서 성능 향상
+- 해당 데이터를 레디스 캐시에 저장해서 DB 조회를 줄이고 응답 속도 향상
 ```java
 @RequiredArgsConstructor
 @Component
