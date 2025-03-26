@@ -518,10 +518,10 @@ public class RefundService {
 	private static final Map<MembershipType, RefundPolicy> REFUND_POLICY_MAP = new HashMap<>();
 
 	static {
-        REFUND_POLICY_MAP.put(MembershipType.BRONZE, new DefaultRefundPolicy());
-        REFUND_POLICY_MAP.put(MembershipType.SILVER, new DefaultRefundPolicy());
-        REFUND_POLICY_MAP.put(MembershipType.GOLD, new GoldRefundPolicy());
-    }
+		REFUND_POLICY_MAP.put(MembershipType.BRONZE, new DefaultRefundPolicy());
+		REFUND_POLICY_MAP.put(MembershipType.SILVER, new DefaultRefundPolicy());
+		REFUND_POLICY_MAP.put(MembershipType.GOLD, new GoldRefundPolicy());
+	}
 
 	public void processRefund(MemberSubscription memberSubscription, String reason) {
         Payment payment = paymentService.getPaymentById(memberSubscription.getPaymentId());
