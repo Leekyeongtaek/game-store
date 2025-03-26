@@ -183,3 +183,80 @@ __인덱스 설정 관련 학습사항__
 - 외래키 설정시 참조 무결성(외래키 값은 반드시 해당 테이블에 존재해야함) 제약 조건 때문에 데이터 삽입/수정 실패하는 상황이 발생한다
 - 레코드 삭제/수정시 순서에 제약이 생긴다
 - 급하게 수정사항 발생시 참조 대상이 없으면 데이터 삽입 실패 발생할 수 있다
+
+#### 스프링 AOP 적용
+```java
+@Slf4j
+@Component
+@Aspect
+public class MyAspect {
+
+  @Around("execution(* com.mrlee.game_store.service.GameService.*(..))")
+  public Object monitorExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+
+    log.info("Execution method: {}", joinPoint.getSignature().getName());
+
+    Object[] args = joinPoint.getArgs();
+    for (int i = 0; i < args.length; i++) {
+      log.info("Execution Parameter [{}]: {}", i + 1, args[i]);
+    }
+
+    long startTime = System.currentTimeMillis();
+
+    Object result = joinPoint.proceed();
+
+    long endTime = System.currentTimeMillis();
+    long executionTime = endTime - startTime;
+
+    if (executionTime > 1000) {
+      log.warn("[PERFORMANCE WARNING] Execution time = {}ms", executionTime);
+    }
+
+    return result;
+  }
+
+  @Around("@annotation(httpRetry)")
+  public Object handleHttpRetry(ProceedingJoinPoint joinPoint, HttpRetry httpRetry) throws Throwable {
+
+    int maxRetryCount = httpRetry.value();
+    Exception exception = null;
+
+    log.info("handleHttpRetry: {}", joinPoint.getSignature().getName());
+
+    for (int i = 0; i <= maxRetryCount; i++) {
+      try {
+	log.info("handleHttpRetry Count={}/{}", i, maxRetryCount);
+	return joinPoint.proceed();
+      } catch (Exception e) {
+	log.info("HTTP 통신 오류:: {}", e.getMessage());
+	exception = e;
+	if (i == (maxRetryCount - 1)) {
+	    Thread.sleep(1000);
+	}
+      }
+    }
+
+    throw exception != null ? exception : new RuntimeException("http 재시도 호출 로직에서 오류 발생.");
+  }
+}
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HttpRetry {
+  int value() default 1;
+}
+
+@Slf4j
+@RequiredArgsConstructor
+@Component
+public class RestTemplateUtil {
+
+  @HttpRetry
+  public void post(String url, Object request) {
+    HttpEntity<Object> httpEntity = createHttpEntity(request);
+    callIamPort(httpEntity);
+  }
+}
+```
+- 쿼리 실행 시간이 1초가 초과하면 해당되는 메서드와 파라미터 조건 로그 기록
+- HTTP 통신 오류 발생시 재시도 한 번 더 실행
