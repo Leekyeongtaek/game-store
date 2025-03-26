@@ -1,5 +1,6 @@
 # Game-Store 프로젝트
 - 플레이스테이션 스토어를 참고해서 만든 게임 사이트로 게임 관리 기능, 할인 게임 목록 조회 기능을 제공하고 있습니다.
+- 핵심 목표: 테이블 설계부터 프론트, 백엔드 파트를 혼자 힘으로 제작하고 운영 서버 실행까지 해보는 것
 
 ## AWS EC2 운영 서버 주소
 - http://15.165.177.116:8080/
@@ -272,7 +273,7 @@ public class RestTemplateUtil {
 
 #### AOP 기술에 대한 학습 내용 정리
 - 핵심 목표: 핵심 기능과 부가 기능을 분리하여, 변하지 않는 핵심 기능과 자주 변경될 수 있는 부가 기능을 명확히 구분한다. 부가 기능에 변경이 생기면 해당 부분만 수정하면 되므로 단일 책임 원칙을 준수한다
-- 포인트컷으로 부가 기능 적용 대상 여부를 판단하고 대상에 해당되면 스프링 빈 후처리기가 대상 객체를 프록시 팩토리를 통해 프록시 객체로 생성하고 원본 객체를 대신해서 스프링 빈으로 등록한다
+- 포인트컷으로 부가 기능 적용 대상 여부를 판단하고, 스프링 빈 후처리기가 대상 객체를 프록시 팩토리를 통해 프록시 객체로 생성하고 원본 객체를 대신해서 스프링 빈으로 등록한다
 - 주요 구성 요소는 Advisor = Advice(부가 기능) + Pointcut(프록시 적용 대상 체크)
 - 타임 체크 어드바이스에서 invocation.proceed()를 기준으로 측정한 시간은 그 안에서 실행된 (모든 어드바이스 + 대상)메서드의 실행 시간까지 포함된다
 - 핵심 기능과 부가 기능 분리를 위한 디자인 패턴 적용 과정<br>
@@ -549,6 +550,217 @@ public class RefundService {
 	private RefundPolicy getRefundPolicy(MembershipType membershipType) {
         return Optional.ofNullable(REFUND_POLICY_MAP.get(membershipType))
                 .orElseThrow(() -> new IllegalArgumentException("환불 정책을 찾을 수 없습니다: " + membershipType));
+    }
+}
+```
+### 테스트 코드 작성
+```java
+public class TestFixtures {
+
+    public static Membership getFreeMembership() {
+        return Membership.builder()
+                .name(Membership.MembershipType.FREE)
+                .price(0)
+                .durationDays(-1) // -1이 "무제한"을 의미하는 이유는, 많은 시스템에서 -1을 “제한 없음”이나 “끝이 없음”을 나타내는 값으로 사용하기 때문
+                .build();
+    }
+
+    public static Membership getBronzeMembership() {
+        return Membership.builder()
+                .name(Membership.MembershipType.BRONZE)
+                .price(10000)
+                .durationDays(30)
+                .build();
+    }
+
+    public static Membership getSilverMembership() {
+        return Membership.builder()
+                .name(Membership.MembershipType.SILVER)
+                .price(20000)
+                .durationDays(30)
+                .build();
+    }
+
+    public static Membership getGoldMembership() {
+        return Membership.builder()
+                .name(Membership.MembershipType.GOLD)
+                .price(30000)
+                .durationDays(30)
+                .build();
+    }
+
+    public static MemberSubscription createSubscription(Long memberId, Membership membership, LocalDate startDate) {
+        return MemberSubscription.builder()
+                .memberId(memberId)
+                .membership(membership)
+                .startDate(startDate)
+                .build();
+    }
+
+    /**
+     * RefundInfo 객체를 생성한다
+     *
+     * @param fullRefundAmount 전체 환불 금액을 의미합니다.
+     *                         예) 전액 환불이 가능한 경우의 환불 예상 금액.
+     * @param usedDays         사용일수를 의미합니다.
+     *                         예) 멤버십을 사용한 총 일수.
+     * @param dailyUsageFee    일일 사용 요금을 의미합니다.
+     *                         예) 하루 사용 시 차감되는 금액.
+     * @return 생성된 RefundInfo 객체.
+     */
+    public static RefundInfo createRefundInfo(long fullRefundAmount, long usedDays, long dailyUsageFee) {
+        return RefundInfo.builder()
+                .fullRefundAmount(fullRefundAmount)
+                .usedDays(usedDays)
+                .dailyUsageFee(dailyUsageFee)
+                .build();
+    }
+}
+
+class MembershipTest {
+
+    //멤버십_하루_사용료는_멤버십_가격_나누기_멤버십_기간을_통해_구할_수_있다
+    @Test
+    void 멤버십_하루_사용료를_계산할_수_있다() {
+        //given
+        Membership bronzeMembership = TestFixtures.getBronzeMembership();
+
+        //when
+        long dailyUsageFee = bronzeMembership.calculateDailyUsageFee();
+
+        //then
+        //int expectedFee = 10000 / 30; // 나눗셈 연산 후 소수점을 버리는(내림 처리)
+        int expectedFee = bronzeMembership.getPrice() / bronzeMembership.getDurationDays();
+        Assertions.assertThat(dailyUsageFee).isEqualTo(expectedFee);
+    }
+}
+
+class MemberSubscriptionTest {
+
+    //Should-When 패턴
+    //회원_구독_기간은_구독_시작일로부터_요청일_차이를_통해_구할_수_있다.
+    @Test
+    void 구독_사용_일수를_계산할_수_있다() {
+        //given
+        Membership bronzeMembership = TestFixtures.getBronzeMembership();
+        LocalDate startDate = LocalDate.of(2025, 3, 10);
+        LocalDate requestDate = LocalDate.of(2025, 3, 20);
+
+        MemberSubscription memberSubscription = TestFixtures.createSubscription(
+                1L, bronzeMembership, startDate);
+
+        //when
+        long usedDays = memberSubscription.calculateUsedDays(requestDate);
+
+        //then
+        assertThat(usedDays).isEqualTo(10);
+    }
+
+}
+
+class DefaultRefundPolicyTest {
+
+    private RefundPolicy defaultRefundPolicy;
+
+    @BeforeEach
+    public void setUp() {
+        defaultRefundPolicy = new DefaultRefundPolicy();
+    }
+
+    @Test
+    void 환불_가능_기간일_경우는_예외가_발생하지_않는다() {
+        //when & then
+        assertDoesNotThrow(() -> defaultRefundPolicy.validateRefundable(0));
+        assertDoesNotThrow(() -> defaultRefundPolicy.validateRefundable(10));
+        assertDoesNotThrow(() -> defaultRefundPolicy.validateRefundable(15));
+    }
+
+    @Test
+    void 환불_가능_기간_이후일_경우는_예외가_발생한다() {
+        //when
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> defaultRefundPolicy.validateRefundable(16));
+
+        //then
+        assertEquals("15일 경과후에는 환불 요청이 불가능합니다.", exception.getMessage());
+    }
+
+    @Test
+    void 전액_환불_가능_기간인_경우_전액_환불_해준다() {
+        //given
+        RefundInfo refundInfo = TestFixtures.createRefundInfo(20000, 2, 666);
+
+        //when
+        long refundAmount = defaultRefundPolicy.calculateRefundAmount(refundInfo);
+        long fullRefundAmount = refundInfo.getFullRefundAmount();
+
+        //then
+        assertThat(refundAmount).isEqualTo(fullRefundAmount);
+    }
+
+    @Test
+    void 전액_환불_기간이_경과하면_부분_환불_해준다() {
+        //given
+        RefundInfo refundInfo = TestFixtures.createRefundInfo(20000, 10, 666);
+
+        //when
+        long refundAmount = defaultRefundPolicy.calculateRefundAmount(refundInfo);
+        long expectedRefundAmount = refundInfo.getFullRefundAmount() - (refundInfo.getDailyUsageFee() * refundInfo.getUsedDays());
+
+        //then
+        assertThat(refundAmount).isEqualTo(expectedRefundAmount);
+    }
+
+    @Test
+    void 환불_프로세스_정상_케이스() {
+        //given
+        RefundInfo refundInfo = TestFixtures.createRefundInfo(20000, 2, 666);
+
+        //when
+        long refundAmount = defaultRefundPolicy.processRefundAmount(refundInfo);
+
+        //then
+        assertThat(refundAmount).isEqualTo(refundInfo.getFullRefundAmount());
+    }
+
+    @Test
+    void 환불_프로세스_환불_예상금액이_0원_이하인_경우_예외발생() {
+        //given
+        RefundInfo refundInfo = TestFixtures.createRefundInfo(10000, 10, 1000);
+
+        //when & then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> defaultRefundPolicy.processRefundAmount(refundInfo));
+        assertThat(exception.getMessage()).isEqualTo("환불 예상 금액이 0원 이하입니다.");
+    }
+
+}
+
+class GoldRefundPolicyTest {
+
+    private RefundPolicy goldRefundPolicy;
+
+    @BeforeEach
+    public void setUp() {
+        goldRefundPolicy = new GoldRefundPolicy();
+    }
+
+    @Test
+    void 환불_가능_기간일_경우는_예외가_발생하지_않는다() {
+        //when & then
+        assertDoesNotThrow(() -> goldRefundPolicy.validateRefundable(0));
+        assertDoesNotThrow(() -> goldRefundPolicy.validateRefundable(10));
+        assertDoesNotThrow(() -> goldRefundPolicy.validateRefundable(20));
+    }
+
+    @Test
+    void 환불_가능_기간_이후일_경우는_예외가_발생한다() {
+        //when
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> goldRefundPolicy.validateRefundable(21));
+
+        //then
+        assertEquals("20일 경과후에는 환불 요청이 불가능합니다.", exception.getMessage());
     }
 }
 ```
