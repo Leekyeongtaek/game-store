@@ -107,6 +107,7 @@ GameController {
   public List<GameGroupResponse> gameGroups() {
       return redisCacheManager.getCacheGameGroups();
   }
+  ...
 }
 ```
 __개선 사항__
@@ -153,3 +154,31 @@ public ResponseEntity<Void> testReadTimeout() {
 __타임아웃 옵션__
 - HTTP 통신 시 연결 시간(connect timeout)이나 응답 대기 시간(read timeout)을 설정하지 않으면, 네트워크 지연이나 서버 응답이 없는 상황에서도 요청을 기다리게 된다<br>
 - 결국 쓰레드 풀에 쓰레드가 반납되지 않게 되어 서버가 다운되는 상황이 발생하게 된다
+
+#### 쿼리 실행 계획과 인덱스 설정, 카디널리티
+```sql
+#할인 중인 게임 목록 조회 쿼리
+SELECT g.*
+FROM game g JOIN game_discount gd 
+	ON g.game_discount_id = gd.game_discount_id
+```
+__인덱스 설정 관련 학습사항___
+- game_discount_id 컬럼에 인덱스를 생성하기 전에는 game 테이블의 rows 수가 약 476건으로 표시되었으나, 인덱스 생성 후에는 약 268건으로 줄어들어 쿼리 성능이 향상됨
+- 인덱스가 없을 경우 전체 테이블 스캔이 발생하는 반면, 인덱스가 존재하면 필요한 데이터만 빠르게 조회하기 때문이다
+- 옵티마이저는 인덱스를 통해 더 효율적인 조인 순서를 선택한다
+- 복합 인덱스는 왼쪽 순서부터 인덱스가 적용된다
+
+##### 실행 계획 타입
+|이름|용도|
+|-----|-----|
+|All|테이블 전체 스캔|
+|Const|단일 테이블 조회, 1건 매칭, primary, unique key|
+|Eq-ref|조인 조회, 1건 매칭, primary, unique key|
+|Ref|일반 인덱스(중복 허용), game 테이블의 type 컬럼 인덱스처럼 중복 존재(PRODUCT, DLC, ITEM, COSTUME, CHARATOR)|
+|Range|인덱스에 범위 검색(ex:Between)|
+|Index|인덱스를 전체 스캔|
+
+##### 외래키 관련 학습 내용
+- 외래키 설정시 참조 무결성(외래키 값은 반드시 해당 테이블에 존재해야함) 제약 조건 때문에 데이터 삽입/수정 실패하는 상황이 발생한다
+- 레코드 삭제/수정시 순서에 제약이 생긴다
+- 급하게 수정사항 발생시 참조 대상이 없으면 데이터 삽입 실패 발생
