@@ -315,7 +315,7 @@ public class Template {
 |프록시 팩토리|인터페이스가 있으면 JDK 동적 프록시 사용, 구체 클래스만 존재하면 CGLIB 프록시 사용|
 |빈 후처리기|스프링 빈 등록시 대상 객체를 프록시 객체로 생성해서 대신 등록하는 역할|
 
-##### 리플렉션과 AOP
+##### 자바 리플렉션과 AOP
 ```
 public class MyService {
   public void save() {...}
