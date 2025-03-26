@@ -273,7 +273,7 @@ public class RestTemplateUtil {
 |이름|용도|문제점|
 |---|---|---|
 |템플릿 메서드|변하는 부분을 추상 클래스 상속을 통해 해결|상속으로 인한 강한 결합도, 부모 클래스 변경 사항 발생시 하위 클래스에 영향이 생김|
-|전략(템플릿 콜백)|인터페이스를 통해 템플릿 메서드의 결합도 문제를 해결하고, 변경 부분을 실행 시점에 변경 가능|적용 대상 코드를 수정 해야한다|
+|전략(템플릿 콜백)|인터페이스를 통해 템플릿 메서드의 결합도 문제를 해결하고, 변경 부분을 실행 시점에 변경 가능|부가 기능 적용을 위해 핵심 코드를 수정 해야함|
 |프록시|대상 객체를 호출하기 전에 부가 기능, 접근 제어 기능 수행, 클라이언트는 대상 객체가 프록시인지 원본 객체인지 모름|프록시 객체를 직접 만들려면 엄청난 수의 클래스 생성이 필요|
 ```java
 //템플릿 메서드 패턴
@@ -314,3 +314,71 @@ public class Template {
 |CGLIB 프록시|구체 클래스 기반의 프록시를 동적으로 생성|
 |프록시 팩토리|인터페이스가 있으면 JDK 동적 프록시 사용, 구체 클래스만 존재하면 CGLIB 프록시 사용|
 |빈 후처리기|스프링 빈 등록시 대상 객체를 프록시 객체로 생성해서 대신 등록하는 역할|
+
+##### 리플렉션과 AOP
+```
+public class MyService {
+  public void save() {...}
+  public void call() {...}
+}
+
+//ReflectiveMethodInvocation 인터셉터 호출 체인(Advice 체인)을 순차적으로 실행하기 위한 객체
+public class TimeAdvice MethodInterceptor {
+  //invocation 객체 내부에 대상 객체, 메서드, 인자 정보가 들어 있다
+  @Override
+  public Object invoke(MethodInvocation invocation) throws Throwable {
+    //타임 체크 시작
+    invocation.proceed(); // 인터셉터 호출 체인, 리플렉션으로 대상 메서드 호출
+    //타임 체크 종료
+  }
+}
+//invocation: 호출
+public class ReflectiveMethodInvocation implements MethodInvocation {
+    private final Method method;
+    private final Object[] arguments;
+    private final Object target;
+    private List<MethodInterceptor> interceptors; // 적용할 어드바이스 목록
+    ...
+    
+    public Object proceed() throws Throwable {
+        ...
+      if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
+	//Method: 메서드에 대한 메타 정보 보관(이름, 클래스, 반환 타입...)
+        //method.invoke(): target의 해당 메서드를 인자와 함께 실행
+  	//런타임 시점에 메서드를 유연하게 실행 가능
+	//MyService 객체의 call() 메서드 호출하라
+        return method.invoke(target, arguments); // <- 리플렉션 사용해서 대상 메서드 호출
+      }
+      Object interceptorOrInterceptionAdvice = this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
+      MethodInterceptor interceptor = (MethodInterceptor) interceptorOrInterceptionAdvice;
+      return interceptor.invoke(this);
+    }
+}
+
+@Test
+void testProxy() {
+  //1. 대상 객체 생성
+  MyService target = new MyService();
+
+  //2. 포인트컷 생성
+  NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+  pointcut.setMappedName("call"); //메서드 이름이 'call'인 경우만 어드바이스 적용
+
+  //3. 어드바이스 생성
+  TimeAdvice advice = new TimeAdvice();
+
+  //4. 어드바이저 생성
+  Advisor advisor = new DefaultPointcutAdvisor(pointcut, advice);
+
+  //5. 프록시 생성
+  ProxyFactory factory = new ProxyFactory(target); //대상 객체 전달
+  factory.addAdvisor(advisor);
+
+  MyService proxy = (MyService) factory.getProxy();
+
+  //6. 프록시 메서드 호출
+  proxy.save(); //프록시 방식에 따라 리플렉션 호출 여부는 다름, 어드바이스 적용 X
+  //ReflectiveMethodInvocation 객체 생성과 어드바이스 목록 파라미터 전달
+  proxy.call(); //리플렉션을 통한 메서드 호출, 어드바이스 적용 O
+}
+```
