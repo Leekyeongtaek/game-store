@@ -1,5 +1,6 @@
 # Game-Store 프로젝트
 - 플레이스테이션 스토어를 참고해서 만든 게임 관리 사이트입니다.
+- JPA만을 사용해서 프로젝트 제작
 
 ## AWS EC2 운영 서버 주소
 - http://15.165.177.116:8080/
@@ -184,7 +185,7 @@ __인덱스 설정 관련 학습사항__
 - 레코드 삭제/수정시 순서에 제약이 생긴다
 - 급하게 수정사항 발생시 참조 대상이 없으면 데이터 삽입 실패 발생할 수 있다
 
-#### 스프링 AOP
+#### 스프링 AOP 관련 학습
 
 ##### 프로젝트 적용 코드
 ```java
@@ -380,5 +381,168 @@ void testProxy() {
   proxy.save(); //프록시 방식에 따라 리플렉션 호출 여부는 다름, 어드바이스 적용 X
   //ReflectiveMethodInvocation 객체 생성과 어드바이스 목록 파라미터 전달
   proxy.call(); //리플렉션을 통한 메서드 호출, 어드바이스 적용 O
+}
+```
+
+#### 멤버십 기능 개선 과정
+##### 기능 요약
+- 멤버십은 FREE, BRONZE, SILVER, GOLD 등급이 존재
+- 결제일로부터 일정 기간 이내는 전액 환불, 이후는 하루 사용 금액 차감 후 환불
+- 환불 요청 시 등급에 따른 환불 정책 적용
+- 주요 학습 목표: 멤버십 등급에 따른 환불 금액 계산
+
+##### 초기 구조의 한계점
+- MemberSubscription 엔티티 내부에서 비즈니스 로직을 처리 -> 지연 로딩 문제 및 엔티티에 비즈니스 로직이 존재함
+
+```java
+public class MemberSubscription {
+
+	private static final int FULL_REFUND_PERIOD = 7;
+	private static final int NON_REFUNDABLE_AFTER = 15;
+
+	private Long id;
+	private Membership membership;
+    ...
+	public long calculateRefundFee(LocalDate refundRequestDate) {
+		validateRefundable();
+		long usedDays = calculateUsedDays(refundRequestDate);
+		validateRefundableDays(usedDays);
+		if (isFullRefundEligible(usedDays)) {
+			return membership.getFullRefundAmount();
+		}
+		return calculateRefundableFee(usedDays);
+	}
+
+	private void validateRefundable() {
+		if (membership.isFree()) {
+			throw new IllegalArgumentException("무료 멤버십은 환불 금액 계산이 불가능합니다.");
+		}
+	}
+
+	private long calculateUsedDays(LocalDate refundRequestDate) {
+        return ChronoUnit.DAYS.between(startDate, refundRequestDate);
+    }
+
+    private long calculateRefundableFee(long usedDays) {
+        long usedFee = membership.calculateDailyUsageFee() * usedDays;
+        return membership.getFullRefundAmount() - usedFee;
+    }
+
+    private void validateRefundableDays(long usedDays) {
+        if (usedDays > NON_REFUNDABLE_AFTER) {
+            throw new IllegalArgumentException("멤버십 사용 기간이 " + NON_REFUNDABLE_AFTER + "일 지나면 환불이 불가능합니다.");
+        }
+    }
+
+    private boolean isFullRefundEligible(long days) {
+        return days < FULL_REFUND_PERIOD;
+    }
+}
+```
+##### 개선 방향
+- RefundPolicy 인터페이스 전략 패턴 도입과 환불 관련 정책 역할 부여
+- 등급별 환불 정책 클래스를 별도로 구현
+- 공통 로직은 RefundPolicy 인터페이스의 default 메서드로 제공하여 중복을 없애고, 각 등급별 정책 클래스는 예외 처리와 금액 계산 방식만 오버라이딩하도록 구성
+- 맵 자료구조를 통해 구현 클래스를 가져오는 방법을 사용해서 if-else 문을 사용하지 않고 가독성을 높이도록 구성
+
+```java
+public interface RefundPolicy {
+
+    void validateRefundable(long usedDays);
+
+    long calculateRefundAmount(RefundInfo refundInfo);
+
+    default RefundType isFullRefundable(long usedDays) {
+        if (usedDays < 3) {
+            return RefundType.FULL;
+        }
+        return RefundType.PARTIAL;
+    }
+
+    default void validateRefundAmount(long refundAmount) {
+        if (refundAmount <= 0) {
+            throw new IllegalArgumentException("환불 예상 금액이 0원 이하입니다.");
+        }
+    }
+
+    default long processRefundAmount(RefundInfo refundInfo) {
+        validateRefundable(refundInfo.getUsedDays());
+        long refundAmount = calculateRefundAmount(refundInfo);
+        validateRefundAmount(refundAmount);
+        return refundAmount;
+    }
+}
+
+public class DefaultRefundPolicy implements RefundPolicy {
+
+    private static final int NON_REFUNDABLE_AFTER = 15;
+
+    @Override
+    public void validateRefundable(long usedDays) {
+        if (usedDays > NON_REFUNDABLE_AFTER) {
+            throw new IllegalArgumentException(NON_REFUNDABLE_AFTER + "일 경과후에는 환불 요청이 불가능합니다.");
+        }
+    }
+
+    @Override
+    public long calculateRefundAmount(RefundInfo refundInfo) {
+        if (isFullRefundable(refundInfo.getUsedDays()) == RefundType.FULL) {
+            return refundInfo.getFullRefundAmount();
+        }
+        return Math.max(0, refundInfo.getFullRefundAmount() - (refundInfo.getDailyUsageFee() * refundInfo.getUsedDays()));
+    }
+}
+
+public class GoldRefundPolicy implements RefundPolicy {
+
+    private static final int NON_REFUNDABLE_AFTER = 20;
+
+    @Override
+    public void validateRefundable(long usedDays) {
+        if (usedDays > NON_REFUNDABLE_AFTER) {
+            throw new IllegalArgumentException(NON_REFUNDABLE_AFTER + "일 경과후에는 환불 요청이 불가능합니다.");
+        }
+    }
+
+    @Override
+    public long calculateRefundAmount(RefundInfo refundInfo) {
+        if (isFullRefundable(refundInfo.getUsedDays()) == RefundType.FULL) { //enum은 싱글턴이라 == 비교가 더 안전하고 성능도 좋다, 안전하다는 의미는 NPE가 발생하지 않음
+            return refundInfo.getFullRefundAmount();
+        }
+        return Math.max(0, refundInfo.getFullRefundAmount() - (refundInfo.getDailyUsageFee() * refundInfo.getUsedDays()));
+    }
+}
+
+public class RefundService {
+
+	private static final Map<MembershipType, RefundPolicy> REFUND_POLICY_MAP = new HashMap<>();
+
+	static {
+        REFUND_POLICY_MAP.put(MembershipType.BRONZE, new DefaultRefundPolicy());
+        REFUND_POLICY_MAP.put(MembershipType.SILVER, new DefaultRefundPolicy());
+        REFUND_POLICY_MAP.put(MembershipType.GOLD, new GoldRefundPolicy());
+    }
+
+	public void processRefund(MemberSubscription memberSubscription, String reason) {
+        Payment payment = paymentService.getPaymentById(memberSubscription.getPaymentId());
+        long refundAmount = calculateRefundAmount(memberSubscription);
+        requestRefund(new RefundRequest(payment, refundAmount, reason));
+    }
+
+	private long calculateRefundAmount(MemberSubscription memberSubscription) {
+        Membership membership = memberSubscription.getMembership();
+        RefundPolicy refundPolicy = getRefundPolicy(membership.getName());
+        return refundPolicy.processRefundAmount(new RefundInfo(memberSubscription));
+    }
+
+	private void requestRefund(RefundRequest form) {
+        restTemplateUtil.post("https://api.iamport.kr/payment/cancel/", new CancelRequest(form.getMerchantId(), form.getRefundAmount()));
+        refundRepository.save(new Refund(form.getPaymentId(), (int) form.getRefundAmount(), form.getReason()));
+    }
+
+	private RefundPolicy getRefundPolicy(MembershipType membershipType) {
+        return Optional.ofNullable(REFUND_POLICY_MAP.get(membershipType))
+                .orElseThrow(() -> new IllegalArgumentException("환불 정책을 찾을 수 없습니다: " + membershipType));
+    }
 }
 ```
