@@ -28,7 +28,7 @@
 ## 테이블 ERD
 
 ### 게임 스토어 관련 테이블
-<img width="800" alt="game_stroe_erd" src="https://github.com/user-attachments/assets/4608589b-2476-43ea-b1bb-1b13f171c846">
+![게임스토어 ERD](./images/game-store.png)
 
 |테이블|인덱스명|컬럼|용도|
 |------|---|---|---|
@@ -40,7 +40,7 @@
 - 할인 게임 목록 조회 쿼리에서 사용되는 인덱스
 
 ### 멤버십 관련 테이블
-<img width="800" alt="game_stroe_erd" src="https://github.com/user-attachments/assets/b7e6c63a-8127-42e7-b277-0d6282c9f687">
+![멤버십 ERD](./images/membership.png)
 
 ## 프로젝트 개선 사항 기록
 
