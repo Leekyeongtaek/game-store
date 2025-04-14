@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Polymorphism {
+public class PolymorphismTest {
 
     @Test
     void 다형성과_OCP원칙_준수_테스트() {
