@@ -812,12 +812,23 @@ void 다형적_참조의_장점과_한계() {
 @Data
 static class MyPoly {
 
-	private List<LittlePoly> polyList;
+private List<LittlePoly> polyList;
 
-	//이 구조는 느슨한 결합(loose coupling)의 대표적인 예시
-	//클래스 내부는 List라는 상위 타입(인터페이스)만 알고 있고, 구체 구현체는 전혀 알지 못하므로 유연한 설계가 가능하다
-	public MyPoly(List<LittlePoly> polyList) {
-		this.polyList = polyList;
+//이 구조는 느슨한 결합(loose coupling)의 대표적인 예시
+//클래스 내부는 List라는 상위 타입(인터페이스)만 알고 있고, 구체 구현체는 전혀 알지 못하므로 유연한 설계가 가능하다
+public MyPoly(List<LittlePoly> polyList) {
+	this.polyList = polyList;
+}
+}
+
+@Data
+static class LittlePoly {
+	private String name;
+	private int age;
+
+	public LittlePoly(String name, int age) {
+		this.name = name;
+		this.age = age;
 	}
 }
 ```
