@@ -24,7 +24,7 @@ public class MembershipInitService {
     private final PaymentRepository paymentRepository;
     private final RefundRepository refundRepository;
 
-    @PostConstruct
+//    @PostConstruct
     public void initService() {
         deleteAllMemberMembership();
         initializeFreeMemberships();

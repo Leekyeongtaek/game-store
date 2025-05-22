@@ -161,4 +161,16 @@ public class PolymorphismTest {
             System.out.println("linkedList 전용 메서드 호출");
         }
     }
+
+    static class A {
+
+    }
+
+    static class B  extends A {
+
+    }
+
+    static class C extends B {
+
+    }
 }

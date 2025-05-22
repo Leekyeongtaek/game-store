@@ -1,5 +1,7 @@
 package com.mrlee.game_store.service;
 
+import com.mrlee.game_store.client.MemberClient;
+import com.mrlee.game_store.client.MemberRes;
 import com.mrlee.game_store.domain.*;
 import com.mrlee.game_store.dto.request.GameSaveForm;
 import com.mrlee.game_store.dto.request.GameDiscountSearchCondition;
@@ -33,6 +35,7 @@ public class GameService {
     private final GenreRepository genreRepository;
     private final PlatformRepository platformRepository;
     private final LanguageRepository languageRepository;
+    private final MemberClient memberClient;
 
     public Long saveGame(GameSaveForm form) {
         Game game = form.toEntity();
@@ -213,6 +216,10 @@ public class GameService {
 
     public GameDetailsResponse getGameDetails(Long gameId) {
         return gameQueryRepository.getGameDetails(gameId);
+    }
+
+    public List<MemberRes> getMembers() {
+        return memberClient.getMembers();
     }
 
     //-------------------- ModelAttribute --------------------//

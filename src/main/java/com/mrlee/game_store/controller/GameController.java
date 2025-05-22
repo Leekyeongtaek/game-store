@@ -1,5 +1,6 @@
 package com.mrlee.game_store.controller;
 
+import com.mrlee.game_store.client.MemberRes;
 import com.mrlee.game_store.dto.request.GameSaveForm;
 import com.mrlee.game_store.dto.request.GameDiscountSearchCondition;
 import com.mrlee.game_store.dto.request.GameUpdateForm;
@@ -7,12 +8,16 @@ import com.mrlee.game_store.dto.response.*;
 import com.mrlee.game_store.dto.response.GamePromotionResponse;
 import com.mrlee.game_store.service.GameService;
 import com.mrlee.game_store.service.RedisCacheManager;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -86,6 +92,7 @@ public class GameController {
         return "redirect:/games/{gameId}";
     }
 
+    @Timed("my.promotion")
     @GetMapping("/search-promotion")
     public String searchPromotionGame(@PageableDefault(size = 18) Pageable pageable, @ModelAttribute GameDiscountSearchCondition condition,
                                       Model model, HttpServletRequest request) {
@@ -101,6 +108,13 @@ public class GameController {
         GameDetailsResponse gameDetails = gameService.getGameDetails(gameId);
         model.addAttribute("game", gameDetails);
         return "game/game-details";
+    }
+
+    @ResponseBody
+    @GetMapping("/members")
+    public ResponseEntity<List<MemberRes>> members() {
+        List<MemberRes> members = gameService.getMembers();
+        return ResponseEntity.ok(members);
     }
 
     //------------------------- ModelAttribute -------------------------//
