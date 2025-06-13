@@ -29,7 +29,7 @@
 ## 테이블 ERD
 
 ### 게임 스토어 관련 테이블
-![게임스토어 ERD](./images/game-store.png)
+![게임스토어 ERD](./images/game-store-erd.png)
 
 ## 프로젝트 개선 사항 기록
 
