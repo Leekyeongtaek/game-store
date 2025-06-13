@@ -32,13 +32,13 @@
 ## 프로젝트 개선 사항 기록
 
 ### 1. 레디스 캐시 적용
-_기존 문제점과 해결방안_
+_기존 문제점과 레디스 사용 장점_
 - 게임 등록 화면을 진입시마다 @ModelAttribute 애노테이션을 통해 게임그룹, 배급사, 언어, 플랫폼, 장르 데이터 쿼리가 5번씩 매번 발생
 - 레디스 서버에 해당 데이터를 캐시로 등록하고 조회하여 사용
-- __레디스 사용시 장점__
 - DB는 디스크 기반 I/O, Redis는 메모리 기반 I/O 속도 차이가 10배 정도 발생
 - DB 커넥션 풀 기본 개수는 10개인데, 트랙피 많이 발생하는 시점에 변경 가능성이 없는 데이터를 자주 조회하면 DB 부하 발생 가능성이 높다
 ```java
+//기존 방식
 @Controller
 GameController {
   ...
@@ -52,6 +52,17 @@ GameController {
   public List<PlatformResponse> platforms() {...}
   @ModelAttribute("genres")
   public List<GenreResponse> genres() {...}
+}
+
+//레디스 매니저 클래스 사용
+@Controller
+GameController {
+  private final RedisCacheManager redisCacheManager;
+
+  @ModelAttribute("gameGroups")
+  public List<GameGroupResponse> gameGroups() {
+      return redisCacheManager.getCacheGameGroups();
+  }
 }
 
 @RequiredArgsConstructor
@@ -94,65 +105,10 @@ public class RedisCacheManager {
 }
 ```
 
-```java
-@RequiredArgsConstructor
-@Component
-public class RedisCacheManager {
-  private final StringRedisTemplate stringRedisTemplate;
-  private final PublisherRepository publisherRepository;
-  private final LanguageRepository languageRepository;
-  private final PlatformRepository platformRepository;
-  ...
-  public List<GameGroupResponse> getCacheGameGroups() {
-        final String KEY = "list:gameGroups";
-        String jsonData = stringRedisTemplate.opsForValue().get(KEY);
-
-        if (jsonData != null) {
-            return deserializeJson(jsonData, new TypeReference<ArrayList<GameGroupResponse>>() {
-            });
-        }
-
-        List<GameGroupResponse> gameGroupResponses = gameGroupRepository.findAll().stream()
-                .sorted(Comparator.comparing(GameGroup::getName))
-                .map(GameGroupResponse::new)
-                .toList();
-
-        stringRedisTemplate.opsForValue().set(KEY, serializeJson(gameGroupResponses), 24, TimeUnit.HOURS);
-
-        return gameGroupResponses;
-    }
-    ...
-    // 객체 → 바이트 스트림(파일, 네트워크 전송용 데이터)으로 변환
-    private <T> String serializeJson(T data) {
-        try {
-            return objectMapper.writeValueAsString(data);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    // 바이트 스트림 → 객체로 변환
-    private <T> T deserializeJson(String json, TypeReference<T> typeReference) {
-        try {
-            return objectMapper.readValue(json, typeReference);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-}
-
-@Controller
-GameController {
-  private final RedisCacheManager redisCacheManager;
-
-  @ModelAttribute("gameGroups")
-  public List<GameGroupResponse> gameGroups() {
-      return redisCacheManager.getCacheGameGroups();
-  }
-  ...
-}
-```
-
 ### 2. HTTP 통신 타임아웃 설정
+__타임아웃 옵션__
+- HTTP 통신 시 연결 시간(connect timeout)이나 응답 대기 시간(read timeout)을 설정하지 않으면, 네트워크 지연이나 서버 응답이 없는 상황에서도 요청을 기다리게 된다<br>
+- 결국 쓰레드 풀에 쓰레드가 반납되지 않게 되어 서버가 다운되는 상황이 발생하게 된다
 ```java
 @Bean
 public RestTemplate restTemplate() {
@@ -161,9 +117,6 @@ public RestTemplate restTemplate() {
   httpRequestFactory.setReadTimeout(5000); //(응답시) socketTimeout, 서버 응답 대기 시간
 }
 ```
-__타임아웃 옵션__
-- HTTP 통신 시 연결 시간(connect timeout)이나 응답 대기 시간(read timeout)을 설정하지 않으면, 네트워크 지연이나 서버 응답이 없는 상황에서도 요청을 기다리게 된다<br>
-- 결국 쓰레드 풀에 쓰레드가 반납되지 않게 되어 서버가 다운되는 상황이 발생하게 된다
 
 ### 3. 쿼리 실행 계획, 인덱스 설정
 ```sql
@@ -188,7 +141,7 @@ __인덱스 설정 관련 학습사항__
 |Range|인덱스에 범위 검색(ex:Between)|
 |Index|인덱스를 전체 스캔|
 
-#### 외래키 관련 학습 내용
+#### 외래키 관련 학습
 - 외래키 설정시 참조 무결성(외래키 값은 반드시 해당 테이블에 존재해야함) 제약 조건 때문에 데이터 삽입/수정 실패하는 상황이 발생한다
 - 레코드 삭제/수정시 순서에 제약이 생긴다
 - 급하게 수정사항 발생시 참조 대상이 없으면 데이터 삽입 실패 발생할 수 있다
@@ -196,6 +149,9 @@ __인덱스 설정 관련 학습사항__
 ### 스프링 AOP 관련 학습
 
 #### 프로젝트 적용 코드
+__APO 적용 기능__
+- 쿼리 실행 시간이 1초가 초과하면 해당되는 메서드와 파라미터 조건 로그 기록
+- HTTP 통신 오류 발생시 재시도 한 번 더 실행
 ```java
 @Slf4j
 @Component
@@ -253,7 +209,7 @@ public class MyAspect {
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HttpRetry {
+public @interface HttpRetry { //재시도 애노테이션 선언
   int value() default 1;
 }
 
@@ -262,132 +218,10 @@ public @interface HttpRetry {
 @Component
 public class RestTemplateUtil {
 
-  @HttpRetry
+  @HttpRetry //재시도 애노테이션
   public void post(String url, Object request) {
     HttpEntity<Object> httpEntity = createHttpEntity(request);
     callIamPort(httpEntity);
   }
-}
-```
-- 쿼리 실행 시간이 1초가 초과하면 해당되는 메서드와 파라미터 조건 로그 기록
-- HTTP 통신 오류 발생시 재시도 한 번 더 실행
-
-#### AOP 기술에 대한 학습 내용 정리
-- 핵심 목표: 핵심 기능과 부가 기능을 분리하여, 변하지 않는 핵심 기능과 자주 변경될 수 있는 부가 기능을 명확히 구분한다. 부가 기능에 변경이 생기면 해당 부분만 수정하면 되므로 단일 책임 원칙을 준수한다
-- 포인트컷으로 부가 기능 적용 대상 여부를 판단하고, 스프링 빈 후처리기가 대상 객체를 프록시 팩토리를 통해 프록시 객체로 생성하고 원본 객체를 대신해서 스프링 빈으로 등록한다
-- 주요 구성 요소는 Advisor = Advice(부가 기능) + Pointcut(프록시 적용 대상 체크)
-- 타임 체크 어드바이스에서 invocation.proceed()를 기준으로 측정한 시간은 그 안에서 실행된 (모든 어드바이스 + 대상)메서드의 실행 시간까지 포함된다
-- 핵심 기능과 부가 기능 분리를 위한 디자인 패턴 적용 과정<br>
-
-|이름|용도|문제점|
-|---|---|---|
-|템플릿 메서드|변하는 부분을 추상 클래스 상속을 통해 해결|상속으로 인한 강한 결합도, 부모 클래스 변경 사항 발생시 하위 클래스에 영향이 생김|
-|전략(템플릿 콜백)|인터페이스를 통해 템플릿 메서드의 결합도 문제를 해결하고, 변경 부분을 실행 시점에 변경 가능|부가 기능 적용을 위해 핵심 코드를 수정 해야함|
-|프록시|대상 객체를 호출하기 전에 부가 기능, 접근 제어 기능 수행, 클라이언트는 대상 객체가 프록시인지 원본 객체인지 모름|프록시 객체를 직접 만들려면 엄청난 수의 클래스 생성이 필요|
-```java
-//템플릿 메서드 패턴
-public abstract class AbstractTemplate<T> {
-
-  public T execute() {
-    //실행 시간 측정
-    T result = call();
-    //실행 시간 측정
-    return result;
-  }
-  protected abstract T call();
-}
-
-//전략 패턴(템플릿 콜백)
-public interface Callback<T> {
-  T call();
-}
-
-public class Template {
-
-  public <T> T execute(Callback<T> callback) {
-    //실행 시간 측정
-    T result = callback.call():
-    //실행 시간 측정
-    return result;
-  }
-}
-```
-
-- 사용 되는 기술<br>
-
-|이름|용도|
-|---|----|
-|쓰레드 로컬|쓰레드마다 가지고 있는 개인 저장 공간|
-|자바 리플렉션|런타임 시점에 조건에 따라 동적으로 메서드 호출이 가능|
-|JDK 동적 프록시|인터페이스 기반 프록시를 동적으로 생성|
-|CGLIB 프록시|구체 클래스 기반의 프록시를 동적으로 생성|
-|프록시 팩토리|인터페이스가 있으면 JDK 동적 프록시 사용, 구체 클래스만 존재하면 CGLIB 프록시 사용|
-|빈 후처리기|스프링 빈 등록시 대상 객체를 프록시 객체로 생성해서 대신 등록하는 역할|
-
-#### 자바 리플렉션과 AOP
-```
-public class MyService {
-  public void save() {...}
-  public void call() {...}
-}
-
-//ReflectiveMethodInvocation 인터셉터 호출 체인(Advice 체인)을 순차적으로 실행하기 위한 객체
-public class TimeAdvice MethodInterceptor {
-  //invocation 객체 내부에 대상 객체, 메서드, 인자 정보가 들어 있다
-  @Override
-  public Object invoke(MethodInvocation invocation) throws Throwable {
-    //타임 체크 시작
-    invocation.proceed(); // 인터셉터 호출 체인, 리플렉션으로 대상 메서드 호출
-    //타임 체크 종료
-  }
-}
-//invocation: 호출
-public class ReflectiveMethodInvocation implements MethodInvocation {
-    private final Method method;
-    private final Object[] arguments;
-    private final Object target;
-    private List<MethodInterceptor> interceptors; // 적용할 어드바이스 목록
-    ...
-    
-    public Object proceed() throws Throwable {
-        ...
-      if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
-	//Method: 메서드에 대한 메타 정보 보관(이름, 클래스, 반환 타입...)
-        //method.invoke(): target의 해당 메서드를 인자와 함께 실행
-  	//런타임 시점에 메서드를 유연하게 실행 가능
-	//MyService 객체의 call() 메서드 호출하라
-        return method.invoke(target, arguments); // <- 리플렉션 사용해서 대상 메서드 호출
-      }
-      Object interceptorOrInterceptionAdvice = this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
-      MethodInterceptor interceptor = (MethodInterceptor) interceptorOrInterceptionAdvice;
-      return interceptor.invoke(this);
-    }
-}
-
-@Test
-void testProxy() {
-  //1. 대상 객체 생성
-  MyService target = new MyService();
-
-  //2. 포인트컷 생성
-  NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
-  pointcut.setMappedName("call"); //메서드 이름이 'call'인 경우만 어드바이스 적용
-
-  //3. 어드바이스 생성
-  TimeAdvice advice = new TimeAdvice();
-
-  //4. 어드바이저 생성
-  Advisor advisor = new DefaultPointcutAdvisor(pointcut, advice);
-
-  //5. 프록시 생성
-  ProxyFactory factory = new ProxyFactory(target); //대상 객체 전달
-  factory.addAdvisor(advisor);
-
-  MyService proxy = (MyService) factory.getProxy();
-
-  //6. 프록시 메서드 호출
-  proxy.save(); //프록시 방식에 따라 리플렉션 호출 여부는 다름, 어드바이스 적용 X
-  //ReflectiveMethodInvocation 객체 생성과 어드바이스 목록 파라미터 전달
-  proxy.call(); //리플렉션을 통한 메서드 호출, 어드바이스 적용 O
 }
 ```
