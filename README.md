@@ -32,8 +32,12 @@
 ## 프로젝트 개선 사항 기록
 
 ### 1. 레디스 캐시 적용
-__개선 전__
-- 게임 등록 관련 화면 진입시마다 변경 가능성 없는 동일한 데이터를 DB에서 반복 조회하는 문제 발생
+_기존 문제점과 해결방안_
+- 게임 등록 화면을 진입시마다 @ModelAttribute 애노테이션을 통해 게임그룹, 배급사, 언어, 플랫폼, 장르 데이터 쿼리가 5번씩 매번 발생
+- 레디스 서버에 해당 데이터를 캐시로 등록하고 조회하여 사용
+- __레디스 사용시 장점__
+- DB는 디스크 기반 I/O, Redis는 메모리 기반 I/O 속도 차이가 10배 정도 발생
+- DB 커넥션 풀 기본 개수는 10개인데, 트랙피 많이 발생하는 시점에 변경 가능성이 없는 데이터를 자주 조회하면 DB 부하 발생 가능성이 높다
 ```java
 @Controller
 GameController {
@@ -49,15 +53,47 @@ GameController {
   @ModelAttribute("genres")
   public List<GenreResponse> genres() {...}
 }
-```
-__개선 후__
-- RedisCacheManager 클래스를 생성 후 빈으로 등록
-- 해당 데이터를 레디스 캐시에 저장해서 DB 조회를 줄이고 응답 속도 향상<br>
 
-__의문점과 해답__
-- 웹서버 입장에서는 데이터를 조회하는 대상이 단순히 데이터베이스에서 레디스 서버로 변경된 것 아닐까?
-- DB는 디스크 기반 I/O, Redis는 메모리 기반 I/O 속도 차이가 10배 정도 발생
-- DB 커넥션 풀 기본 개수는 10개인데, 트랙피 많이 발생하는 시점에 변경 가능성이 적은 데이터를 자주 조회하면 DB 부하 발생 가능성이 높다
+@RequiredArgsConstructor
+@Component
+public class RedisCacheManager {
+	public List<GenreResponse> getCacheGenres() {
+		final String KEY = "list:genres";
+		String jsonData = stringRedisTemplate.opsForValue().get(KEY);
+		
+		if (jsonData != null) {
+			return deserializeJson(jsonData, new TypeReference<ArrayList<GenreResponse>>() {
+			});
+		}
+		
+		List<GenreResponse> genreResponses = genreRepository.findAll().stream()
+				.map(GenreResponse::new)
+				.sorted(Comparator.comparing(GenreResponse::getName))
+				.toList();
+		
+		stringRedisTemplate.opsForValue().set(KEY, serializeJson(genreResponses), 24, TimeUnit.HOURS);
+		
+		return genreResponses;
+    }
+
+	private <T> String serializeJson(T data) {
+        try {
+            return objectMapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+	private <T> T deserializeJson(String json, TypeReference<T> typeReference) {
+        try {
+            return objectMapper.readValue(json, typeReference);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
 ```java
 @RequiredArgsConstructor
 @Component
@@ -116,41 +152,13 @@ GameController {
 }
 ```
 
-### 2. HTTP 통신 설정
+### 2. HTTP 통신 타임아웃 설정
 ```java
 @Bean
 public RestTemplate restTemplate() {
   SimpleClientHttpRequestFactory httpRequestFactory = new SimpleClientHttpRequestFactory();
   httpRequestFactory.setConnectTimeout(3000); //(연결시) 서버와 연결(Connection) 시도 최대 대기 시간
   httpRequestFactory.setReadTimeout(5000); //(응답시) socketTimeout, 서버 응답 대기 시간
-}
-/**
- * RestTemplate 커넥션 타임아웃용 테스트 API
- *
- * @return
- */
-@GetMapping("/connection-test")
-public ResponseEntity<Void> testConnection() {
-    try {
-        restTemplate.getForObject("http://10.255.255.1", String.class);
-    } catch (ResourceAccessException e) {
-        log.info("ConnectTimeout:: {}", e.getMessage());
-    }
-    return new ResponseEntity<>(HttpStatus.OK);
-}
-
-/**
- * HTTPBin HTTP 테스트용 API
- * @return
- */
-@GetMapping("/read-test")
-public ResponseEntity<Void> testReadTimeout() {
-    try {
-        restTemplate.getForObject("https://httpbin.org/delay/6", String.class);
-    } catch (ResourceAccessException e) {
-        log.info("ReadTimeout:: {}", e.getMessage());
-    }
-    return new ResponseEntity<>(HttpStatus.OK);
 }
 ```
 __타임아웃 옵션__
