@@ -237,4 +237,4 @@ public class RestTemplateUtil {
     - EC2 인스턴스 생성시에 IAM 역할을 통해 ECR에 업로드된 도커 파일을 받아서 도커로 실행
     - AWS Certificate Manager에서 인증서 발급 -> 기존 http에서 https로 변경
 #### AWS ERD
-![AWS_ERD](./images/game-store-aws-erd.drawio.png)
+<img src="./images/game-store-aws-erd.drawio.png" alt="AWS_ERD" width="550"/>
