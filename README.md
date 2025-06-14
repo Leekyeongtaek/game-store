@@ -236,3 +236,5 @@ public class RestTemplateUtil {
  	- 프로젝트 파일을 .jar로 빌드하고 Docker 이미지로 만든 후 AWS ElasticContainerRegistry에 도커 이미지를 업로드
     - EC2 인스턴스 생성시에 IAM 역할을 통해 ECR에 업로드된 도커 파일을 받아서 도커로 실행
     - AWS Certificate Manager에서 인증서 발급 -> 기존 http에서 https로 변경
+#### AWS ERD
+![AWS_ERD](./images/game-store-aws-erd.drawio.png)
