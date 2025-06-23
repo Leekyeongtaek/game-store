@@ -3,8 +3,8 @@
 - [참고한 PSN 스토어 프로모션 탭](https://store.playstation.com/ko-kr/pages/deals)
 
 ## AWS 운영 서버 및 스웨거
-- [15.165.177.116:8080](http://15.165.177.116:8080/)
-- [게임 주문 조회 API 스웨거](https:naver.com)
+- [Game-Store 운영 서버](https://www.ktstore.click/)
+- [Game-Store 주문 도메인 스웨거](https://www.ktstore.click/swagger-ui/index.html)
 
 ## 목차
 - [기술 스택](#기술-스택)
