@@ -36,13 +36,19 @@
 ### 1. 테스트를 통한 성능 향상 기록
 _JMeter를 사용한 스파이크 테스트_
 - 조건: 동시 접속자 150명이 60초간 게임 할인 목록 조회 API 요청
-- CPU 사용량
 - 변경 전: 엔티티 조회 후 DTO 변환
 - 변경 후: Proejction 생성자 + 컬렉션 데이터는 별도 쿼리 조회 방식
 - 코드 변경 사항
+
+|방법|ㅇㅇ|ㅁ|
+|-----|-----|-----|
+|조회 방법|프로세스 CPU 사용량(%)|최소 지연시간|최대 지연시간|초당 처리량|전체 처리량|실패율|
+|엔티티 조회|28|
+|Proejction 생성자|15|ㄷ|
+
 ```java
-//1.엔티티 직접 조회(BatchSize 옵션 사용)
 public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
+	//1.엔티티 직접 조회(BatchSize 옵션 사용)
 	queryFactory.select(game)
                 .from(game)
                 .join(game.gameDiscount, gameDiscount).fetchJoin()
@@ -53,8 +59,8 @@ public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
                         gameDiscountPriceCondition(condition.getWebBasePrices())
                 )
                 .fetch();
-//2. 엔티티를 DTO로 변환해서 반환
-games.stream().map(GamePromotionResponse::new).toList();
+	//2. 엔티티를 DTO로 변환해서 반환
+	games.stream().map(GamePromotionResponse::new).toList();
 }
 
 public PageImpl<GamePromotionResponse> improvedSearchPromotionGame() {
