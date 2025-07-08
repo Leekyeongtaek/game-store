@@ -4,7 +4,6 @@
 
 ## AWS 운영 서버 및 스웨거
 - [Game-Store 운영 서버](https://www.ktstore.click/)
-- [Game-Store 주문 도메인 스웨거](https://www.ktstore.click/swagger-ui/index.html)
 
 ## 목차
 - [기술 스택](#기술-스택)
