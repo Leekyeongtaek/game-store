@@ -42,7 +42,7 @@ _JMeter를 사용한 스파이크 테스트_
 |조회 방법|CPU 사용량(%)|최소 지연 시간(ms)|최대 지연시간(ms)|초당 처리량|전체 처리량|실패율|
 |---|---|---|---|---|---|---|
 |엔티티 조회|28|6|1741|547|33,000|0|
-|Proejction 생성자|15|2|1500|1229|74,000|0|
+|Proejction 생성자|15|2|1500|1,229|74,000|0|
 #### 코드 변경 사항
 ```java
 public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
