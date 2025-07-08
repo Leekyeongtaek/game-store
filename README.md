@@ -33,8 +33,51 @@
 
 ## 프로젝트 개선 사항 기록
 
-### 1. 테스트
-- 띠요요용!
+### 1. 테스트를 통한 성능 향상 기록
+_JMeter를 사용한 스파이크 테스트_
+- 조건: 동시 접속자 150명이 60초간 게임 할인 목록 조회 API 요청
+- CPU 사용량
+- 코드 변경 사항
+```java
+//1.엔티티 직접 조회(BatchSize 옵션 사용)
+oldSearchPromotionGame() {
+	queryFactory.select(game)
+                .from(game)
+                .join(game.gameDiscount, gameDiscount).fetchJoin()
+                .where(
+                        genreCondition(condition.getGenreIds()),
+                        platformCondition(condition.getPlatformIds()),
+                        gameTypesIn(condition.getTypes()),
+                        gameDiscountPriceCondition(condition.getWebBasePrices())
+                )
+                .orderBy(createPromotionOrderSpecifiers(pageable).toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+//2. 엔티티를 DTO로 변환해서 반환
+games.stream().map(GamePromotionResponse::new).toList();
+}
+
+improvedSearchPromotionGame() {
+	//1.Proejction 생성자 사용
+	queryFactory.select(
+				Projections.constructor(ImprovedGamePromotionResponse.class,
+					game.id, game.name, game.price, game.coverImage,
+                    game.type, gameDiscount.discountPrice, gameDiscount.discountRate))
+                .from(game)
+                .join(game.gameDiscount, gameDiscount)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+	//2. 플랫폼 컬렉션 데이터 추가 조회
+	queryFactory.select(gamePlatform.game.id, platform.name)
+                .from(gamePlatform)
+                .join(gamePlatform.platform, platform)
+                .where(gamePlatform.game.id.in(gameIds))
+                .fetch()
+}
+```
 
 ### 2. 레디스 캐시 적용
 _기존 문제점과 레디스 사용 장점_
