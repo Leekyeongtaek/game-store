@@ -24,6 +24,9 @@
 ### 개발 도구
 - IntelliJ IDEA
 
+### 테스트 도구
+- JMeter
+
 ## 테이블 ERD
 
 ![게임스토어 ERD](./images/game-store-erd.png)
