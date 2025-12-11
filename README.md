@@ -3,15 +3,15 @@
 - [참고한 PSN 스토어 프로모션 탭](https://store.playstation.com/ko-kr/pages/deals)
 
 ## AWS 운영 서버 및 스웨거
-- ~~`https://www.ktstore.click/`~~ AWS 프리티어 계정 만료와 AWS 무료 정책 변경으로 인해서 하단에 로컬 실행 이미지로 대체 했습니다.
+- `https://www.ktstore.click/` AWS 프리티어 계정 만료와 AWS 무료 정책 변경으로 인해서 하단에 로컬 실행 이미지로 대체 했습니다.
 
 ### 로컬 실행 이미지
-<img src="./images/photo1.png" alt="AWS_ERD" width="550"/>
-<img src="./images/photo2.png" alt="AWS_ERD" width="550"/>
-<img src="./images/photo3.png" alt="AWS_ERD" width="550"/>
-<img src="./images/photo4.png" alt="AWS_ERD" width="550"/>
-<img src="./images/photo5.png" alt="AWS_ERD" width="550"/>
-<img src="./images/photo6.png" alt="AWS_ERD" width="550"/>
+<img src="./images/photo1.png" alt="로컬 실행 화면1" width="500"/>
+<img src="./images/photo2.png" alt="로컬 실행 화면2" width="500"/>
+<img src="./images/photo3.png" alt="로컬 실행 화면3" width="500"/>
+<img src="./images/photo4.png" alt="로컬 실행 화면4" width="500"/>
+<img src="./images/photo5.png" alt="로컬 실행 화면5" width="500"/>
+<img src="./images/photo6.png" alt="로컬 실행 화면6" width="500"/>
 
 ## 목차
 - [기술 스택](#기술-스택)
