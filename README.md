@@ -3,7 +3,10 @@
 - [참고한 PSN 스토어 프로모션 탭](https://store.playstation.com/ko-kr/pages/deals)
 
 ## AWS 운영 서버 및 스웨거
-- [Game-Store 운영 서버](https://www.ktstore.click/)
+- https://www.ktstore.click/
+
+## AWS ERD
+<img src="./images/game-store-aws-erd.drawio.png" alt="AWS_ERD" width="550"/>
 
 ## 목차
 - [기술 스택](#기술-스택)
