@@ -35,57 +35,46 @@
 ### 1. 테스트를 통한 성능 향상 기록
 _JMeter를 사용한 스파이크 테스트_
 - 테스트 조건: 동시 접속자 150명이 60초간 게임 할인 목록 조회 API 요청
-- 테스트 컴퓨터: 맥북 M2 프로, 램 16GB, CPU 8코어
+- 테스트 컴퓨터 사양: 맥북 M2 프로, 램 16GB, CPU 8코어
 - 변경 전: 엔티티 조회 후 DTO 변환
 - 변경 후: Proejction 생성자 + 컬렉션 데이터는 별도 쿼리 조회 방식
 - 성능 차이가 발생하는 이유(엔티티 전체 로딩에 따른 오버헤드)
 	- Game 엔티티의 모든 컬럼을 조회하면서 불필요한 데이터 전송 및 메모리 사용량 증가
  	- JPA는 조회한 엔티티를 영속성 컨텍스트에 저장하고 스냅샷 생성 → CPU 및 메모리 오버헤드 발생
-  	- 특히 @OneToMany 연관 관계가 있는 경우, 변경 감지(dirty checking), cascade 관리 등으로 인해 추가 비용이 커짐
 #### 테스트 결과 테이블
 |조회 방법|프로세스 CPU 사용량(%)|최소 지연 시간(ms)|최대 지연시간(ms)|초당 처리량(TPS)|전체 처리량|실패율|
 |---|---|---|---|---|---|---|
-|엔티티 조회|28|6|1741|547 req/sec|33,000|0|
-|Proejction 생성자|15|2|1500|1,229 req/sec|74,000|0|
-#### 코드 변경 사항
+|엔티티 조회 방식|28|6|1741|547 req/sec|33,000|0|
+|Proejction DTO 생성자 방식|15|2|1500|1,229 req/sec|74,000|0|
+#### 할인 목록 조회 코드
 ```java
 public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
 	//1.엔티티 직접 조회(BatchSize 옵션 사용)
-	queryFactory.select(game)
-                .from(game)
-                .join(game.gameDiscount, gameDiscount).fetchJoin()
-                .where(
-                        genreCondition(condition.getGenreIds()),
-                        platformCondition(condition.getPlatformIds()),
-                        gameTypesIn(condition.getTypes()),
-                        gameDiscountPriceCondition(condition.getWebBasePrices())
-                )
-                .fetch();
-	//2. 엔티티를 DTO로 변환해서 반환
-	games.stream().map(GamePromotionResponse::new).toList();
+	return queryFactory.select(game)
+					.from(game)
+					.join(game.gameDiscount, gameDiscount).fetchJoin()
+					.where(
+							genreCondition(condition.getGenreIds()),
+							platformCondition(condition.getPlatformIds()),
+							gameTypesIn(condition.getTypes()),
+							gameDiscountPriceCondition(condition.getWebBasePrices())
+					)
+					.fetch();
 }
 
 public PageImpl<GamePromotionResponse> improvedSearchPromotionGame() {
 	//1.Proejction 생성자 사용
-	queryFactory.select(Projections.constructor(ImprovedGamePromotionResponse.class,
-					game.id, game.name, game.price, game.coverImage,
-					game.type, gameDiscount.discountPrice, gameDiscount.discountRate))
+	return queryFactory.select(Projections.constructor(ImprovedGamePromotionResponse.class,
+					game.id, game.name, game.price, game.coverImage...))
                 .from(game)
                 .join(game.gameDiscount, gameDiscount)
-		.where(
+				.where(
                         genreCondition(condition.getGenreIds()),
                         platformCondition(condition.getPlatformIds()),
                         gameTypesIn(condition.getTypes()),
                         gameDiscountPriceCondition(condition.getWebBasePrices()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetch();
-
-	//2. 플랫폼 컬렉션 데이터 추가 조회
-	queryFactory.select(gamePlatform.game.id, platform.name)
-                .from(gamePlatform)
-                .join(gamePlatform.platform, platform)
-                .where(gamePlatform.game.id.in(gameIds))
                 .fetch();
 }
 ```
