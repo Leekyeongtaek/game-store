@@ -68,17 +68,9 @@ public PageImpl<GamePromotionResponse> improvedSearchPromotionGame() {
 	//1.Proejction 생성자 사용
 	return queryFactory
 				.select(Projections.constructor(ImprovedGamePromotionResponse.class,
-							game.id, game.name, game.price, game.coverImage...))
+							game.id, game.name, game.price, game.coverImage, ...))
                 .from(game)
-                .join(game.gameDiscount, gameDiscount)
-				.where(
-                        genreCondition(condition.getGenreIds()),
-                        platformCondition(condition.getPlatformIds()),
-                        gameTypesIn(condition.getTypes()),
-                        gameDiscountPriceCondition(condition.getWebBasePrices()))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+				...
 }
 ```
 
