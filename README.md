@@ -2,8 +2,8 @@
 - 플레이스테이션 스토어를 참고해서 만든 게임 사이트로 게임 관리 기능, 할인 게임 목록 조회 기능을 제공하고 있습니다.
 
 ## 포트폴리오 서버
-- AWS 프리티어 계정 만료로 클라우드 플레어로 도메인 주소 변경
-- <a href="https://mrlee-gamestore.com/" target="_blank" rel="noopener noreferrer"> Game-Store 서비스 바로가기 </a>
+- AWS 프리티어 계정 만료로 클라우드 플레어 도메인으로 주소 변경
+- <a href="https://mrlee-gamestore.com/" target="_blank" rel="noopener noreferrer"> Game-Store 바로가기 </a>
 
 ## 목차
 - [기술 스택](#기술-스택)
