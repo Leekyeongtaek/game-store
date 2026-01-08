@@ -85,14 +85,6 @@ _기존 문제점과 레디스 사용 장점_
 @Controller
 GameController {
   ...
-  @ModelAttribute("gameGroups")
-  public List<GameGroupResponse> gameGroups() {...}
-  @ModelAttribute("publishers")
-  public List<PublisherResponse> publishers() {...}
-  @ModelAttribute("languages")
-  public List<LanguageResponse> languages() {...}
-  @ModelAttribute("platforms")
-  public List<PlatformResponse> platforms() {...}
   @ModelAttribute("genres")
   public List<GenreResponse> genres() {...}
 }
@@ -131,19 +123,11 @@ public class RedisCacheManager {
     }
 
 	private <T> String serializeJson(T data) {
-        try {
-            return objectMapper.writeValueAsString(data);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+		return objectMapper.writeValueAsString(data);
     }
 
 	private <T> T deserializeJson(String json, TypeReference<T> typeReference) {
-        try {
-            return objectMapper.readValue(json, typeReference);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+		return objectMapper.readValue(json, typeReference);
     }
 }
 ```
