@@ -1,17 +1,8 @@
 # Game-Store 프로젝트
 - 플레이스테이션 스토어를 참고해서 만든 게임 사이트로 게임 관리 기능, 할인 게임 목록 조회 기능을 제공하고 있습니다.
-- [참고한 PSN 스토어 프로모션 탭](https://store.playstation.com/ko-kr/pages/deals)
 
 ## AWS 운영 서버 및 스웨거
 - `https://www.ktstore.click/` AWS 프리티어 계정 만료와 무료 정책 변경으로 인해서 하단에 로컬 실행 이미지로 대체 했습니다.
-
-### 로컬 실행 이미지
-<img src="./images/photo1.png" alt="로컬 실행 화면1" width="700"/>
-<img src="./images/photo2.png" alt="로컬 실행 화면2" width="700"/>
-<img src="./images/photo3.png" alt="로컬 실행 화면3" width="700"/>
-<img src="./images/photo4.png" alt="로컬 실행 화면4" width="700"/>
-<img src="./images/photo5.png" alt="로컬 실행 화면5" width="700"/>
-<img src="./images/photo6.png" alt="로컬 실행 화면6" width="700"/>
 
 ## 목차
 - [기술 스택](#기술-스택)
