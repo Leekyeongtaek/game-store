@@ -52,22 +52,23 @@ _JMeter를 사용한 스파이크 테스트_
 ```java
 public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
 	//1.엔티티 직접 조회(BatchSize 옵션 사용)
-	return queryFactory.select(game)
+	return queryFactory
+					.select(game)
 					.from(game)
 					.join(game.gameDiscount, gameDiscount).fetchJoin()
 					.where(
-							genreCondition(condition.getGenreIds()),
-							platformCondition(condition.getPlatformIds()),
-							gameTypesIn(condition.getTypes()),
-							gameDiscountPriceCondition(condition.getWebBasePrices())
-					)
+                        genreCondition(condition.getGenreIds()),
+                        platformCondition(condition.getPlatformIds()),
+                        gameTypesIn(condition.getTypes()),
+                        gameDiscountPriceCondition(condition.getWebBasePrices()))
 					.fetch();
 }
 
 public PageImpl<GamePromotionResponse> improvedSearchPromotionGame() {
 	//1.Proejction 생성자 사용
-	return queryFactory.select(Projections.constructor(ImprovedGamePromotionResponse.class,
-					game.id, game.name, game.price, game.coverImage...))
+	return queryFactory
+				.select(Projections.constructor(ImprovedGamePromotionResponse.class,
+							game.id, game.name, game.price, game.coverImage...))
                 .from(game)
                 .join(game.gameDiscount, gameDiscount)
 				.where(
