@@ -48,7 +48,7 @@ _JMeter를 사용한 스파이크 테스트_
 |엔티티 조회 방식|28|6|1741|547 req/sec|33,000|0|
 |Proejction DTO 생성자 방식|15|2|1500|1,229 req/sec|74,000|0|
 
-#### 할인 목록 조회 코드
+#### 테스트 코드
 ```java
 public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
 	//1.엔티티 직접 조회(BatchSize 옵션 사용)
