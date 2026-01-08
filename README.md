@@ -174,16 +174,6 @@ __인덱스 설정 관련 학습사항__
 - 옵티마이저는 인덱스를 통해 더 효율적인 조인 순서를 선택한다
 - 복합 인덱스는 왼쪽 순서부터 인덱스가 적용된다
 
-### 5. AWS 환경 개선
-- 기존 프로젝트 구조와 배포 방식
-	- 게임 이미지를 프로젝트 내에 resources/static/image 폴더에 직접 저장해서 사용
-	- 인텔리제이 빌드를 통해 .jar 파일 생성
- 	- ssh로 원격 ec2 서버를 접속하고 scp 명령어를 통해서 .jar 파일을 전송
-  	- ec2 서버의 .jar 파일을 실행
-- 개선 사항
-	- AWS의 S3 버킷에 게임 이미지를 저장하고 CloudFront를 사용해서 이미지를 캐시화해서 조회하는 방식으로 변경
- 	- 프로젝트 파일을 .jar로 빌드하고 Docker 이미지로 만든 후 AWS ElasticContainerRegistry에 도커 이미지를 업로드
-    - EC2 인스턴스 생성시에 IAM 역할을 통해 ECR에 업로드된 도커 파일을 받아서 도커로 실행
-    - AWS Certificate Manager에서 인증서 발급 -> 기존 http에서 https로 변경
+### 5. AWS 환경 구성
 #### AWS ERD
 <img src="./images/game-store-aws-erd.drawio.png" alt="AWS_ERD" width="550"/>
