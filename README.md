@@ -3,9 +3,7 @@
 
 ## 포트폴리오 서버
 - AWS 프리티어 계정 만료로 클라우드 플레어로 도메인 주소 변경
-- <a href="https://mrlee-gamestore.com/" target="_blank" rel="noopener noreferrer">
-👉 Game-Store 서비스 바로가기
-</a>
+- <a href="https://mrlee-gamestore.com/" target="_blank" rel="noopener noreferrer"> Game-Store 서비스 바로가기 </a>
 
 ## 목차
 - [기술 스택](#기술-스택)
