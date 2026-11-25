@@ -152,6 +152,5 @@ __인덱스 설정 관련 학습사항__
 - 옵티마이저는 인덱스를 통해 더 효율적인 조인 순서를 선택한다
 - 복합 인덱스는 왼쪽 순서부터 인덱스가 적용된다
 
-### 5. AWS 환경 구성(계정만료로 ERD만 유지)
-#### AWS ERD
+### 5. AWS 환경 구성 (계정만료로 ERD만 유지)
 <img src="./images/game-store-aws-erd.drawio.png" alt="AWS_ERD" width="550"/>
