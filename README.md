@@ -45,24 +45,24 @@ _JMeter를 사용한 스파이크 테스트_
 // 엔티티 직접 조회(BatchSize 옵션 사용)
 public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
 	return queryFactory
-					.select(game)
-					.from(game)
-					.join(game.gameDiscount, gameDiscount).fetchJoin()
-					.where(
-                        genreCondition(condition.getGenreIds()),
-                        platformCondition(condition.getPlatformIds()),
-                        gameTypesIn(condition.getTypes()),
-                        gameDiscountPriceCondition(condition.getWebBasePrices()))
-					.fetch();
+			.select(game)
+			.from(game)
+			.join(game.gameDiscount, gameDiscount).fetchJoin()
+			.where(
+				genreCondition(condition.getGenreIds()),
+				platformCondition(condition.getPlatformIds()),
+				gameTypesIn(condition.getTypes()),
+				gameDiscountPriceCondition(condition.getWebBasePrices()))
+			.fetch();
 }
 
 // Proejction DTO 생성자 사용
 public PageImpl<GamePromotionResponse> improvedSearchPromotionGame() {
 	return queryFactory
-				.select(Projections.constructor(ImprovedGamePromotionResponse.class,
-					game.id, game.name, game.price, game.coverImage, ...))
-				.from(game)
-				...
+			.select(Projections.constructor(ImprovedGamePromotionResponse.class,
+				game.id, game.name, game.price, game.coverImage, ...))
+			.from(game)
+			...
 }
 ```
 
