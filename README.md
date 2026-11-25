@@ -61,7 +61,7 @@ public PageImpl<GamePromotionResponse> improvedSearchPromotionGame() {
 	return queryFactory
 				.select(Projections.constructor(ImprovedGamePromotionResponse.class,
 					game.id, game.name, game.price, game.coverImage, ...))
-                .from(game)
+				.from(game)
 				...
 }
 ```
