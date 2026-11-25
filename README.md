@@ -67,7 +67,7 @@ public PageImpl<GamePromotionResponse> improvedSearchPromotionGame() {
 ```
 
 ### 2. 레디스 캐시 적용
-_기존 문제점 & 레디스 사용 장점_단점
+__레디스 사용 이유 & 트레이드오프__
 - 게임 등록 화면을 진입시마다 @ModelAttribute 애노테이션을 통해 게임그룹, 배급사, 언어, 플랫폼, 장르 데이터 쿼리가 매번 발생
 - 레디스 서버에 해당 데이터를 캐시로 등록하고 조회하여 사용
 - DB는 디스크 기반 I/O, Redis는 메모리 기반 I/O 속도 차이가 10배 정도 발생
