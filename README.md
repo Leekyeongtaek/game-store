@@ -1,4 +1,4 @@
-# Game-Store 프로젝트 핵심 요약
+# Game-Store 핵심 요약
 - 스파이크 테스트: Entity -> Projection DTO 방식의 성능 개선
 - 레디스를 도입하기 전 고려할 트레이드오프
 - HTTP 커넥션 타임아웃 설정이 필요한 이유
