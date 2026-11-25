@@ -41,8 +41,8 @@ _JMeter를 사용한 스파이크 테스트_
 
 #### 테스트 코드
 ```java
+// 엔티티 직접 조회(BatchSize 옵션 사용)
 public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
-	//1.엔티티 직접 조회(BatchSize 옵션 사용)
 	return queryFactory
 					.select(game)
 					.from(game)
@@ -55,11 +55,11 @@ public PageImpl<GamePromotionResponse> oldSearchPromotionGame() {
 					.fetch();
 }
 
+// Proejction DTO 생성자 사용
 public PageImpl<GamePromotionResponse> improvedSearchPromotionGame() {
-	//1.Proejction 생성자 사용
 	return queryFactory
 				.select(Projections.constructor(ImprovedGamePromotionResponse.class,
-							game.id, game.name, game.price, game.coverImage, ...))
+				  game.id, game.name, game.price, game.coverImage, ...))
                 .from(game)
 				...
 }
