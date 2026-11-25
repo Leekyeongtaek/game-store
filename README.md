@@ -13,7 +13,7 @@
 - SpringBoot 3.4.1
 - JPA (Spring Data JPA, QueryDSL)
 - MySql 8.0.32
-- AWS: EC2
+- AWS
 
 ### 테스트 도구
 - JMeter
