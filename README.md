@@ -1,5 +1,5 @@
 # Game-Store 핵심 요약
-- 스파이크 테스트: Entity -> Projection DTO 방식의 성능 개선
+- 스파이크 테스트: JPA 조회 시 Entity -> Projection DTO 방식의 성능 개선
 - 레디스 캐시 사용 이유 & 트레이드오프
 - HTTP 커넥션 타임아웃 설정이 필요한 이유
 
